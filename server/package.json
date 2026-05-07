@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "build": "npm install && npm rebuild sqlite3 --build-from-source",
     "dev": "node index.js",
     "init-db": "node init-db.js",
     "test": "echo \"Error: no test specified\" && exit 1"
