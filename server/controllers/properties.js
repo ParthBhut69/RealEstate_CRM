@@ -2,7 +2,6 @@ const { pool } = require('../db');
 
 exports.getAll = async (req, res) => {
   try {
-<<<<<<< HEAD
     const { minArea, maxArea, size, minPrice, maxPrice, type, furnishing_status, location } = req.query;
     let query = 'SELECT * FROM properties WHERE 1=1';
     let params = [];
@@ -18,9 +17,6 @@ exports.getAll = async (req, res) => {
     
     query += ' ORDER BY created_at DESC';
     const { rows } = await pool.query(query, params);
-=======
-    const { rows } = await pool.query('SELECT * FROM properties ORDER BY created_at DESC');
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -40,7 +36,6 @@ exports.getById = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-<<<<<<< HEAD
     const { title, description, price, status, building_name, address, location, area, size, type, amenities, furnishing_status } = req.body || {};
     let image_url = null;
     let images = '[]';
@@ -52,12 +47,6 @@ exports.create = async (req, res) => {
     const { lastID } = await pool.query(
       'INSERT INTO properties (title, description, price, status, building_name, address, location, area, size, type, amenities, furnishing_status, image_url, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [title, description, price, status || 'Available', building_name, address, location, area, size, type, amenities, furnishing_status, image_url, images]
-=======
-    const { title, description, price, status } = req.body;
-    const { lastID } = await pool.query(
-      'INSERT INTO properties (title, description, price, status) VALUES (?, ?, ?, ?)',
-      [title, description, price, status || 'Available']
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
     );
     const { rows } = await pool.query('SELECT * FROM properties WHERE id = ?', [lastID]);
     res.status(201).json(rows[0]);
@@ -69,7 +58,6 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-<<<<<<< HEAD
     const { title, description, price, status, building_name, address, location, area, size, type, amenities, furnishing_status } = req.body;
     
     let query = 'UPDATE properties SET title = ?, description = ?, price = ?, status = ?, building_name = ?, address = ?, location = ?, area = ?, size = ?, type = ?, amenities = ?, furnishing_status = ?';
@@ -85,13 +73,6 @@ exports.update = async (req, res) => {
     params.push(id);
     
     const { rowCount } = await pool.query(query, params);
-=======
-    const { title, description, price, status } = req.body;
-    const { rowCount } = await pool.query(
-      'UPDATE properties SET title = ?, description = ?, price = ?, status = ? WHERE id = ?',
-      [title, description, price, status, id]
-    );
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
     if (rowCount === 0) return res.status(404).json({ error: 'Property not found' });
     const { rows } = await pool.query('SELECT * FROM properties WHERE id = ?', [id]);
     res.json(rows[0]);

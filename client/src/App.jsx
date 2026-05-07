@@ -9,19 +9,13 @@ import Inquiries from './pages/Inquiries';
 import Tasks from './pages/Tasks';
 import Projects from './pages/Projects';
 import Login from './pages/Login';
-<<<<<<< HEAD
 import Signup from './pages/Signup';
-=======
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-<<<<<<< HEAD
       <Route path="/signup" element={<Signup />} />
-=======
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
       <Route path="/" element={
         <ProtectedRoute>
           <Layout />

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import api from '../api/axios';
-<<<<<<< HEAD
 import { MessageSquare, Plus, X, Pencil, Trash2, FileText, Send } from 'lucide-react';
 
 const STATUS_OPTIONS = ['New', 'In Progress', 'Resolved', 'Closed'];
@@ -19,14 +18,10 @@ function Modal({ title, onClose, children }) {
     </div>
   );
 }
-=======
-import { MessageSquare } from 'lucide-react';
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
 
 export default function Inquiries() {
   const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(true);
-<<<<<<< HEAD
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -40,18 +35,11 @@ export default function Inquiries() {
   const [savingNote, setSavingNote] = useState(false);
 
   useEffect(() => { fetchInquiries(); }, []);
-=======
-
-  useEffect(() => {
-    fetchInquiries();
-  }, []);
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
 
   const fetchInquiries = async () => {
     try {
       const { data } = await api.get('/inquiries');
       setInquiries(data);
-<<<<<<< HEAD
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   };
@@ -118,28 +106,13 @@ export default function Inquiries() {
   const statusColor = (s) => s === 'New' ? 'bg-blue-100 text-blue-700' : s === 'In Progress' ? 'bg-yellow-100 text-yellow-700' : s === 'Resolved' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-700';
 
   if (loading) return <div className="text-center p-8 text-slate-500">Loading...</div>;
-=======
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) return <div className="text-center p-8">Loading...</div>;
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-800">Inquiries</h1>
-<<<<<<< HEAD
         <button onClick={openAdd} className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-emerald-700 transition-colors">
           <Plus className="w-4 h-4" /> Add Inquiry
-=======
-        <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-emerald-700 transition-colors">
-          Add Inquiry
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
         </button>
       </div>
 
@@ -152,11 +125,7 @@ export default function Inquiries() {
                 <th className="px-6 py-4 text-sm font-semibold text-slate-600">Contact Info</th>
                 <th className="px-6 py-4 text-sm font-semibold text-slate-600">Status</th>
                 <th className="px-6 py-4 text-sm font-semibold text-slate-600">Date</th>
-<<<<<<< HEAD
                 <th className="px-6 py-4 text-right text-sm font-semibold text-slate-600">Actions</th>
-=======
-                <th className="px-6 py-4"></th>
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -172,7 +141,6 @@ export default function Inquiries() {
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600">{inq.contact_info}</td>
                   <td className="px-6 py-4">
-<<<<<<< HEAD
                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusColor(inq.status)}`}>{inq.status}</span>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-500">{new Date(inq.created_at).toLocaleDateString()}</td>
@@ -182,36 +150,16 @@ export default function Inquiries() {
                       <button onClick={() => openEdit(inq)} className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"><Pencil className="w-4 h-4" /></button>
                       <button onClick={() => handleDelete(inq.id)} className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"><Trash2 className="w-4 h-4" /></button>
                     </div>
-=======
-                    <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
-                      {inq.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-500">
-                    {new Date(inq.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button className="text-sm font-medium text-blue-600 hover:text-blue-700">View</button>
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
                   </td>
                 </tr>
               ))}
               {inquiries.length === 0 && (
-<<<<<<< HEAD
                 <tr><td colSpan="5" className="px-6 py-12 text-center text-slate-500">No inquiries found. <button onClick={openAdd} className="text-emerald-600 font-medium hover:underline">Add one →</button></td></tr>
-=======
-                <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-slate-500">
-                    No inquiries found.
-                  </td>
-                </tr>
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
               )}
             </tbody>
           </table>
         </div>
       </div>
-<<<<<<< HEAD
 
       {showModal && (
         <Modal title={editing ? 'Edit Inquiry' : 'Add Inquiry'} onClose={closeModal}>
@@ -286,9 +234,3 @@ export default function Inquiries() {
     </div>
   );
 }
-
-=======
-    </div>
-  );
-}
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a

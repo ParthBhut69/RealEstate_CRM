@@ -2,23 +2,12 @@ import { Outlet, NavLink } from 'react-router-dom';
 import { Home, Bell, User, PlusCircle, Briefcase } from 'lucide-react';
 import { useState } from 'react';
 import QuickAddModal from './QuickAddModal';
-<<<<<<< HEAD
 import NotificationToast from './NotificationToast';
 import { useNotifications } from '../context/NotificationContext';
 
 export default function Layout() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { unreadCount } = useNotifications();
-=======
-
-export default function Layout() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const navItems = [
-    { to: '/', icon: Home, label: 'Home' },
-    { to: '/alerts', icon: Bell, label: 'Alerts' },
-  ];
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -55,16 +44,11 @@ export default function Layout() {
           <NavLink
             to="/alerts"
             className={({ isActive }) =>
-<<<<<<< HEAD
               `relative flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${
-=======
-              `flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
                 isActive ? 'text-blue-600 bg-blue-50' : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50'
               }`
             }
           >
-<<<<<<< HEAD
             <div className="relative">
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
@@ -75,9 +59,6 @@ export default function Layout() {
                 </span>
               )}
             </div>
-=======
-            <Bell className="w-5 h-5" />
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
             <span className="font-medium">Alerts</span>
           </NavLink>
         </div>
@@ -103,7 +84,7 @@ export default function Layout() {
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around items-center h-16 px-2 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+      <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around items-center h-16 px-2 z-10 shadow-[0_-4_6px_-1px_rgba(0,0,0,0.05)]">
         <NavLink to="/" className={({ isActive }) => `flex flex-col items-center justify-center w-16 h-full ${isActive ? 'text-blue-600' : 'text-slate-500'}`}>
           <Home className="w-6 h-6" />
           <span className="text-[10px] mt-1 font-medium">Home</span>
@@ -123,7 +104,6 @@ export default function Layout() {
           </button>
         </div>
 
-<<<<<<< HEAD
         <NavLink to="/alerts" className={({ isActive }) => `relative flex flex-col items-center justify-center w-16 h-full ${isActive ? 'text-blue-600' : 'text-slate-500'}`}>
           <div className="relative">
             <Bell className="w-6 h-6" />
@@ -133,10 +113,6 @@ export default function Layout() {
               </span>
             )}
           </div>
-=======
-        <NavLink to="/alerts" className={({ isActive }) => `flex flex-col items-center justify-center w-16 h-full ${isActive ? 'text-blue-600' : 'text-slate-500'}`}>
-          <Bell className="w-6 h-6" />
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
           <span className="text-[10px] mt-1 font-medium">Alerts</span>
         </NavLink>
 
@@ -147,12 +123,9 @@ export default function Layout() {
       </nav>
 
       <QuickAddModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-<<<<<<< HEAD
 
       {/* Global toast container — visible on every page */}
       <NotificationToast />
-=======
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
     </div>
   );
 }

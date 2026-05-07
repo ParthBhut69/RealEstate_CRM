@@ -60,7 +60,6 @@ exports.remove = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-<<<<<<< HEAD
 
 exports.getNotes = async (req, res) => {
   try {
@@ -88,5 +87,3 @@ exports.addNote = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-=======
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
