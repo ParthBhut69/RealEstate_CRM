@@ -4,9 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+<<<<<<< HEAD
     "start": "node index.js",
     "dev": "node index.js",
     "init-db": "node init-db.js",
+=======
+>>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -19,7 +22,10 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+<<<<<<< HEAD
     "multer": "^2.1.1",
+=======
+>>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
     "pg": "^8.20.0",
     "sqlite": "^5.1.1",
     "sqlite3": "^6.0.1"

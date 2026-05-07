@@ -1,4 +1,6 @@
-node_modules/
+node_modules
 .env
-dist/
-crm.sqlite
+dist
+server/crm.sqlite
+server/public/uploads
+.DS_Store

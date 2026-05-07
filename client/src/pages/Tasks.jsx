@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../api/axios';
+<<<<<<< HEAD
 import { CheckSquare, Plus, X, Pencil, Trash2, Check } from 'lucide-react';
 
 const STATUS_OPTIONS = ['Pending', 'In Progress', 'Completed'];
@@ -18,10 +19,14 @@ function Modal({ title, onClose, children }) {
     </div>
   );
 }
+=======
+import { CheckSquare } from 'lucide-react';
+>>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
 
 export default function Tasks() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+<<<<<<< HEAD
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -29,11 +34,18 @@ export default function Tasks() {
   const [error, setError] = useState('');
 
   useEffect(() => { fetchTasks(); }, []);
+=======
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+>>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
 
   const fetchTasks = async () => {
     try {
       const { data } = await api.get('/tasks');
       setTasks(data);
+<<<<<<< HEAD
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   };
@@ -73,18 +85,34 @@ export default function Tasks() {
   };
 
   if (loading) return <div className="text-center p-8 text-slate-500">Loading...</div>;
+=======
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div className="text-center p-8">Loading...</div>;
+>>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-800">Tasks</h1>
+<<<<<<< HEAD
         <button onClick={openAdd} className="flex items-center gap-2 bg-orange-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-orange-700 transition-colors">
           <Plus className="w-4 h-4" /> Add Task
+=======
+        <button className="bg-orange-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-orange-700 transition-colors">
+          Add Task
+>>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
         </button>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
         {tasks.map(task => (
+<<<<<<< HEAD
           <div key={task.id} className="flex items-center gap-4 py-4 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors px-4 rounded-xl group">
             <button onClick={() => toggleComplete(task)} className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0 ${task.status === 'Completed' ? 'bg-green-500 border-green-500 text-white' : 'border-slate-300 hover:border-orange-400'}`}>
               {task.status === 'Completed' && <Check className="w-3.5 h-3.5" />}
@@ -100,10 +128,24 @@ export default function Tasks() {
               <button onClick={() => openEdit(task)} className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"><Pencil className="w-4 h-4" /></button>
               <button onClick={() => handleDelete(task.id)} className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"><Trash2 className="w-4 h-4" /></button>
             </div>
+=======
+          <div key={task.id} className="flex items-center gap-4 py-4 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors px-4 rounded-xl">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${task.status === 'Completed' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'}`}>
+              <CheckSquare className="w-5 h-5" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-slate-800">{task.title}</h3>
+              <p className="text-sm text-slate-500">Due: {new Date(task.due_date).toLocaleDateString()}</p>
+            </div>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${task.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-700'}`}>
+              {task.status}
+            </span>
+>>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
           </div>
         ))}
         {tasks.length === 0 && (
           <div className="text-center py-12">
+<<<<<<< HEAD
             <CheckSquare className="w-10 h-10 text-slate-300 mx-auto mb-3" />
             <p className="text-slate-500 font-medium">No tasks found.</p>
             <button onClick={openAdd} className="mt-3 text-orange-600 text-sm font-medium hover:underline">Add your first task →</button>
@@ -142,3 +184,12 @@ export default function Tasks() {
   );
 }
 
+=======
+            <p className="text-slate-500">No tasks found. Add one to get started.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+>>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a

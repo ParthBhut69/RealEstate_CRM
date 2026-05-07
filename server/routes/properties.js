@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const propertiesController = require('../controllers/properties');
+<<<<<<< HEAD
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -24,6 +25,13 @@ router.get('/', propertiesController.getAll);
 router.get('/:id', propertiesController.getById);
 router.post('/', upload.array('images', 10), propertiesController.create);
 router.put('/:id', upload.array('images', 10), propertiesController.update);
+=======
+
+router.get('/', propertiesController.getAll);
+router.get('/:id', propertiesController.getById);
+router.post('/', propertiesController.create);
+router.put('/:id', propertiesController.update);
+>>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
 router.delete('/:id', propertiesController.remove);
 
 module.exports = router;

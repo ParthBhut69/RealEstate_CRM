@@ -2,10 +2,15 @@ import { useState, useEffect } from 'react';
 import { Home as HomeIcon, MessageSquare, Briefcase, CheckSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
+<<<<<<< HEAD
 import { useAuth } from '../context/AuthContext';
 
 export default function Home() {
   const { user } = useAuth();
+=======
+
+export default function Home() {
+>>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
   const [stats, setStats] = useState({
     properties: 0,
     inquiries: 0,
@@ -36,7 +41,11 @@ export default function Home() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
+<<<<<<< HEAD
           <p className="text-slate-500 mt-1">Welcome back, <span className="font-semibold text-slate-700">{user?.name || 'User'}</span>! Here's your overview.</p>
+=======
+          <p className="text-slate-500 mt-1">Welcome back! Here's your overview.</p>
+>>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
         </div>
       </div>
 
