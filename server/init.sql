@@ -5,10 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     phone VARCHAR(50),
     role VARCHAR(50) DEFAULT 'Agent',
-<<<<<<< HEAD
     avatar_url VARCHAR(255),
-=======
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -18,7 +15,6 @@ CREATE TABLE IF NOT EXISTS properties (
     description TEXT,
     price DECIMAL(15, 2) NOT NULL,
     status VARCHAR(50) DEFAULT 'Available',
-<<<<<<< HEAD
     building_name VARCHAR(255),
     address TEXT,
     location VARCHAR(255),
@@ -29,8 +25,6 @@ CREATE TABLE IF NOT EXISTS properties (
     image_url VARCHAR(255),
     images TEXT,
     furnishing_status VARCHAR(50),
-=======
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -85,7 +79,6 @@ CREATE TABLE IF NOT EXISTS loan_inquiries (
     status VARCHAR(50) DEFAULT 'Pending',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
-<<<<<<< HEAD
 
 CREATE TABLE IF NOT EXISTS inquiry_notes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -108,5 +101,3 @@ CREATE TABLE IF NOT EXISTS alerts (
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
-=======
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a

@@ -12,11 +12,8 @@
   "dependencies": {
     "axios": "^1.15.2",
     "clsx": "^2.1.1",
-<<<<<<< HEAD
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
-=======
->>>>>>> 0bcc2838d85c6a3e0a21a5db252a0a31061ad87a
     "lucide-react": "^1.11.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
