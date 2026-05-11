@@ -1,7 +1,7 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import { Home, Bell, User, PlusCircle, Briefcase, Shield } from 'lucide-react';
 import { useState } from 'react';
-import QuickAddModal from './QuickAddModal';
+import AddActionMenu from './AddActionMenu';
 import NotificationToast from './NotificationToast';
 import { useNotifications } from '../context/NotificationContext';
 import { useAuth } from '../context/AuthContext';
@@ -13,7 +13,7 @@ export default function Layout() {
   const isAdmin = user?.role?.toLowerCase() === 'admin';
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col overflow-x-hidden">
       {/* Desktop Top Navigation */}
       <nav className="hidden md:flex w-full bg-white shadow-sm h-16 items-center px-8 justify-between sticky top-0 z-10">
         <div className="flex items-center gap-2">
@@ -36,13 +36,7 @@ export default function Layout() {
             <span className="font-medium">Home</span>
           </NavLink>
 
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors shadow-sm"
-          >
-            <PlusCircle className="w-5 h-5" />
-            <span>Add New</span>
-          </button>
+          <AddActionMenu />
 
           <NavLink
             to="/alerts"
@@ -115,7 +109,7 @@ export default function Layout() {
         <div className="relative -top-5">
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-blue-200 border-4 border-slate-50 active:scale-95 transition-transform"
+            className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl shadow-blue-200 border-4 border-slate-50 active:scale-90 transition-transform"
           >
             <PlusCircle className="w-8 h-8" />
           </button>
@@ -146,9 +140,6 @@ export default function Layout() {
         </NavLink>
       </nav>
 
-      <QuickAddModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-
-      {/* Global toast container — visible on every page */}
       <NotificationToast />
     </div>
   );

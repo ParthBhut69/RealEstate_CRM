@@ -20,10 +20,10 @@ router.post('/register', async (req, res) => {
     }
     const hash = await bcrypt.hash(password, 10);
     const result = await pool.query(
-      `INSERT INTO users (name, email, password_hash, phone, role) VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO users (name, email, password_hash, phone, role) VALUES (?, ?, ?, ?, ?) RETURNING id`,
       [name, email, hash, phone || '', role || 'Agent']
     );
-    const userId = result.lastID || result.rows[0].id;
+    const userId = result.rows[0].id;
     const token = jwt.sign({ id: userId }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
     const userRes = await pool.query('SELECT id, name, email, role, phone, avatar_url, two_factor_enabled FROM users WHERE id = ?', [userId]);
     res.status(201).json({ token, user: userRes.rows[0] });

@@ -40,13 +40,21 @@ const pool = {
     }
 
     const db = await getDb();
-    const isSelect = sql.trim().toUpperCase().startsWith('SELECT') || sql.trim().toUpperCase().startsWith('PRAGMA') || sql.trim().toUpperCase().startsWith('RETURNING');
-    if (isSelect) {
+    const normalizedSql = sql.trim().toUpperCase();
+    const isQuery = normalizedSql.startsWith('SELECT') || 
+                   normalizedSql.startsWith('PRAGMA') || 
+                   normalizedSql.includes('RETURNING');
+    
+    if (isQuery) {
       const rows = await db.all(sql, params);
       return { rows };
     } else {
       const result = await db.run(sql, params);
-      return { rowCount: result.changes, lastID: result.lastID, rows: [{ id: result.lastID }] };
+      return { 
+        rowCount: result.changes, 
+        lastID: result.lastID, 
+        rows: result.lastID ? [{ id: result.lastID }] : [] 
+      };
     }
   }
 };

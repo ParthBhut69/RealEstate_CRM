@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Home, MessageSquare, Briefcase, CheckSquare, Users, DollarSign, CreditCard } from 'lucide-react';
+import { X, Home, MessageSquare, Briefcase, CheckSquare, Users, DollarSign, CreditCard, PlusCircle } from 'lucide-react';
 import api from '../api/axios';
 
 const options = [
@@ -42,11 +42,10 @@ export default function QuickAddModal({ isOpen, onClose }) {
       setActiveForm(null);
       setFormData({});
       onClose();
-      // Optionally trigger a global refresh or state update
       window.location.reload();
     } catch (err) {
       console.error('Error saving:', err);
-      alert('Failed to save data. See console for details.');
+      alert('Failed to save data. Please check required fields.');
     } finally {
       setLoading(false);
     }
@@ -57,9 +56,9 @@ export default function QuickAddModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div 
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity animate-in fade-in duration-300"
         onClick={() => {
           if (activeForm) {
             setActiveForm(null);
@@ -68,11 +67,16 @@ export default function QuickAddModal({ isOpen, onClose }) {
         }}
       />
       
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md relative z-10 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between p-4 border-b border-slate-100">
-          <h2 className="text-lg font-semibold text-slate-800">
-            {activeForm ? currentOption?.label : 'Quick Action'}
-          </h2>
+      <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg relative z-10 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 slide-in-from-bottom-10 duration-500">
+        <div className="flex items-center justify-between p-8 border-b border-slate-50 bg-slate-50/50">
+          <div>
+            <h2 className="text-2xl font-black text-slate-900 leading-none">
+              {activeForm ? currentOption?.label : 'Quick Access'}
+            </h2>
+            <p className="text-slate-500 text-sm mt-2 font-medium">
+              {activeForm ? `Create a new ${activeForm.slice(0, -1)} entry.` : 'What would you like to add today?'}
+            </p>
+          </div>
           <button 
             onClick={() => {
               if (activeForm) {
@@ -80,40 +84,47 @@ export default function QuickAddModal({ isOpen, onClose }) {
                 setFormData({});
               } else onClose();
             }}
-            className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+            className="p-3 text-slate-400 hover:text-slate-900 hover:bg-white rounded-2xl transition-all shadow-sm border border-transparent hover:border-slate-100"
           >
-            <X className="w-5 h-5" />
+            <X className="w-6 h-6" />
           </button>
         </div>
 
-        <div className="p-4 max-h-[80vh] overflow-y-auto">
+        <div className="p-8 max-h-[70vh] overflow-y-auto">
           {!activeForm ? (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               {options.map((opt) => (
                 <button
                   key={opt.id}
                   onClick={() => setActiveForm(opt.id)}
-                  className="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 hover:border-blue-100 hover:bg-blue-50/50 transition-all group"
+                  className="flex flex-col items-start p-6 rounded-3xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all group text-left relative overflow-hidden"
                 >
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${opt.bg} ${opt.color} mb-2 group-hover:scale-110 transition-transform`}>
-                    <opt.icon className="w-5 h-5" />
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${opt.bg} ${opt.color} mb-4 group-hover:scale-110 transition-transform duration-300 shadow-sm`}>
+                    <opt.icon className="w-6 h-6" />
                   </div>
-                  <span className="text-sm font-medium text-slate-700">{opt.label}</span>
+                  <span className="text-base font-bold text-slate-800">{opt.label}</span>
+                  <span className="text-xs text-slate-400 font-medium mt-1">Add to database</span>
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <PlusCircle className={`w-5 h-5 ${opt.color}`} />
+                  </div>
                 </button>
               ))}
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {currentOption?.fields.map(field => (
                 <div key={field.name}>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">{field.label}</label>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                    {field.label}
+                  </label>
                   {field.type === 'textarea' ? (
                     <textarea 
                       required
                       name={field.name}
                       onChange={handleInputChange}
-                      className="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                      rows={3}
+                      placeholder={`Enter ${field.label.toLowerCase()}...`}
+                      className="w-full rounded-2xl border-slate-200 bg-slate-50/50 px-5 py-4 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-slate-900 placeholder:text-slate-300 font-medium"
+                      rows={4}
                     />
                   ) : (
                     <input 
@@ -121,29 +132,30 @@ export default function QuickAddModal({ isOpen, onClose }) {
                       type={field.type || 'text'}
                       name={field.name}
                       onChange={handleInputChange}
-                      className="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                      placeholder={`Enter ${field.label.toLowerCase()}...`}
+                      className="w-full rounded-2xl border-slate-200 bg-slate-50/50 px-5 py-4 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-slate-900 placeholder:text-slate-300 font-medium"
                     />
                   )}
                 </div>
               ))}
               
-              <div className="flex justify-end gap-2 pt-4">
+              <div className="flex gap-4 pt-6">
                 <button 
                   type="button"
                   onClick={() => {
                     setActiveForm(null);
                     setFormData({});
                   }} 
-                  className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                  className="flex-1 py-4 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-2xl transition-all border border-slate-100"
                 >
                   Back
                 </button>
                 <button 
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm disabled:opacity-50"
+                  className="flex-[2] py-4 text-sm font-black text-white bg-blue-600 hover:bg-blue-700 rounded-2xl transition-all shadow-xl shadow-blue-200 disabled:opacity-50 active:scale-95"
                 >
-                  {loading ? 'Saving...' : 'Save'}
+                  {loading ? 'Processing...' : 'Complete Action'}
                 </button>
               </div>
             </form>

@@ -15,6 +15,7 @@ import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import AdminPanel from './pages/AdminPanel';
+import GenericFormPage from './pages/GenericFormPage';
 
 function App() {
   return (
@@ -35,10 +36,14 @@ function App() {
         <Route path="inquiries" element={<Inquiries />} />
         <Route path="tasks" element={<Tasks />} />
         <Route path="projects" element={<ProjectsList />} />
-        <Route path="projects/new" element={<ProjectForm />} />
+        <Route path="projects/new" element={<GenericFormPage type="project" />} />
         <Route path="projects/:id" element={<ProjectDetails />} />
         <Route path="projects/:id/edit" element={<ProjectForm isEdit={true} />} />
         <Route path="admin" element={<AdminPanel />} />
+        <Route path="add-property" element={<GenericFormPage type="property" />} />
+        <Route path="add-project" element={<GenericFormPage type="project" />} />
+        <Route path="add-inquiry" element={<GenericFormPage type="inquiry" />} />
+        <Route path="add-task" element={<GenericFormPage type="task" />} />
       </Route>
     </Routes>
   );

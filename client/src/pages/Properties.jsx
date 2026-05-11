@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { Home, Plus, X, Pencil, Trash2, Filter, Image as ImageIcon, Download } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -46,6 +47,7 @@ const formatRupees = (val) => {
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
 
 export default function Properties() {
+  const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -79,7 +81,7 @@ export default function Properties() {
     finally { setLoading(false); }
   };
 
-  const openAdd = () => { setEditing(null); setForm(EMPTY_FORM); setImageFiles([]); setError(''); setShowModal(true); };
+  const openAdd = () => { navigate('/add-property'); };
   
   const openEdit = (prop) => { 
     setEditing(prop); 
