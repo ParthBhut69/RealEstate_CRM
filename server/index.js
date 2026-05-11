@@ -32,6 +32,11 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+  
+  // Auto-initialize database on startup
+  const initializeDatabase = require('./init-db');
+  initializeDatabase();
+
   // Start background job that auto-creates alerts for due/overdue tasks
   const { startAlertChecker } = require('./jobs/alertChecker');
   startAlertChecker();
