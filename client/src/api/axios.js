@@ -5,7 +5,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('crm_token');
+  const token = localStorage.getItem('brokerflow_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

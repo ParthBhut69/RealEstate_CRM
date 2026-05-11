@@ -20,7 +20,8 @@ export default function Profile() {
     name: user?.name || '',
     role: user?.role || '',
     email: user?.email || '',
-    phone: user?.phone || ''
+    phone: user?.phone || '',
+    two_factor_enabled: user?.two_factor_enabled || false
   });
 
   const handleLogout = () => {
@@ -56,6 +57,7 @@ export default function Profile() {
     data.append('role', formData.role);
     data.append('email', formData.email);
     data.append('phone', formData.phone);
+    data.append('two_factor_enabled', formData.two_factor_enabled);
     if (avatarFile) {
       data.append('avatar', avatarFile);
     }
@@ -79,7 +81,8 @@ export default function Profile() {
       name: user?.name || '',
       role: user?.role || '',
       email: user?.email || '',
-      phone: user?.phone || ''
+      phone: user?.phone || '',
+      two_factor_enabled: user?.two_factor_enabled || false
     });
     setAvatarPreview(null);
     setAvatarFile(null);
@@ -233,18 +236,30 @@ export default function Profile() {
               </div>
             </div>
           </div>
+
+          <div className="space-y-6">
+            <div className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50">
+              <div className="flex items-center gap-3">
+                <Lock className="w-5 h-5 text-slate-400" />
+                <div>
+                  <p className="text-sm font-medium text-slate-700">Two-Step Verification</p>
+                  <p className="text-xs text-slate-500">Secure your account with Email OTP</p>
+                </div>
+              </div>
+              <button 
+                type="button"
+                disabled={!isEditing}
+                onClick={() => setFormData({...formData, two_factor_enabled: !formData.two_factor_enabled})}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${formData.two_factor_enabled ? 'bg-blue-600' : 'bg-slate-200'} ${!isEditing ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${formData.two_factor_enabled ? 'translate-x-5' : 'translate-x-0'}`} />
+              </button>
+            </div>
+          </div>
         </div>
 
         {!isEditing && (
           <div className="mt-8 pt-8 border-t border-slate-100 space-y-3">
-            <button className="w-full flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-blue-100 hover:bg-blue-50/50 transition-colors group">
-              <div className="flex items-center gap-3 text-slate-700 group-hover:text-blue-700 font-medium">
-                <Lock className="w-5 h-5" />
-                Change Password
-              </div>
-              <span className="text-slate-400 group-hover:text-blue-400">→</span>
-            </button>
-
             <button 
               onClick={handleLogout}
               className="w-full flex items-center justify-between p-4 rounded-xl border border-red-100 bg-red-50 hover:bg-red-100 transition-colors group"

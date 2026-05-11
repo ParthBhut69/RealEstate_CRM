@@ -17,11 +17,10 @@ const upload = multer({ storage: storage });
 
 router.put('/profile', authMiddleware, upload.single('avatar'), async (req, res) => {
   try {
-    const { name, role, email, phone } = req.body;
-    const db = await getDb();
+    const { name, role, email, phone, two_factor_enabled } = req.body;
     
-    let query = 'UPDATE users SET name = ?, role = ?, email = ?, phone = ?';
-    let params = [name, role, email, phone];
+    let query = 'UPDATE users SET name = ?, role = ?, email = ?, phone = ?, two_factor_enabled = ?';
+    let params = [name, role, email, phone, two_factor_enabled === 'true' || two_factor_enabled === true ? 1 : 0];
     
     let avatar_url = req.body.avatar_url || null;
 
@@ -34,11 +33,11 @@ router.put('/profile', authMiddleware, upload.single('avatar'), async (req, res)
     query += ' WHERE id = ?';
     params.push(req.user.id);
     
-    await db.run(query, params);
+    await pool.query(query, params);
     
-    const updatedUser = await db.get('SELECT id, name, email, role, phone, avatar_url FROM users WHERE id = ?', [req.user.id]);
+    const updatedUserRes = await pool.query('SELECT id, name, email, role, phone, avatar_url, two_factor_enabled FROM users WHERE id = ?', [req.user.id]);
     
-    res.json({ user: updatedUser });
+    res.json({ user: updatedUserRes.rows[0] });
   } catch (err) {
     console.error('Update profile error:', err);
     res.status(500).json({ message: 'Server error' });

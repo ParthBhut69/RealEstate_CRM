@@ -6,6 +6,11 @@ CREATE TABLE IF NOT EXISTS users (
     phone VARCHAR(50),
     role VARCHAR(50) DEFAULT 'Agent',
     avatar_url VARCHAR(255),
+    reset_token VARCHAR(255),
+    reset_expires DATETIME,
+    two_factor_enabled INTEGER DEFAULT 0,
+    otp_code VARCHAR(10),
+    otp_expires DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -40,8 +45,27 @@ CREATE TABLE IF NOT EXISTS inquiries (
 CREATE TABLE IF NOT EXISTS projects (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(255) NOT NULL,
+    location VARCHAR(255),
     description TEXT,
-    status VARCHAR(50) DEFAULT 'Planning',
+    property_type VARCHAR(255), -- e.g., '1 BHK, 2 BHK'
+    total_size VARCHAR(100),
+    sqft_area DECIMAL(10, 2),
+    amenities TEXT, -- comma separated
+    price_per_sqft DECIMAL(15, 2),
+    total_price DECIMAL(15, 2),
+    rera_number VARCHAR(100),
+    builder_name VARCHAR(255),
+    builder_website VARCHAR(255),
+    possession_date DATE,
+    status VARCHAR(50) DEFAULT 'Under Construction', -- 'Ready to Move', 'Under Construction', 'Sold Out'
+    map_location TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS project_images (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
+    image_url VARCHAR(255) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

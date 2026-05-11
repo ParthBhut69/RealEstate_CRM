@@ -1,0 +1,44 @@
+services:
+  # Backend Server
+  - type: web
+    name: brokerflow-api
+    env: node
+    plan: free
+    buildCommand: cd server && npm install && npm rebuild sqlite3 --build-from-source
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 5000
+      - key: FRONTEND_URL
+        fromService:
+          name: brokerflow-frontend
+          type: static_site
+          property: host
+      # EMAIL_USER and EMAIL_PASS should be set in Render Dashboard
+
+  # Frontend Static Site
+  - type: static_site
+    name: brokerflow-frontend
+    env: static
+    plan: free
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: client/dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: brokerflow-api
+          type: web
+          property: host
+        suffix: /api
+      - key: VITE_API_BASE
+        fromService:
+          name: brokerflow-api
+          type: web
+          property: host
+    rewriteRules:
+      - source: /*
+        destination: /index.html

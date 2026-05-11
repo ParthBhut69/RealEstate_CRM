@@ -26,7 +26,7 @@ app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/alerts', require('./routes/alerts'));
 
 app.get('/', (req, res) => {
-  res.send('Real Estate CRM API');
+  res.send('BrokerFlow API - Premium Real Estate Management');
 });
 
 app.listen(port, () => {

@@ -63,7 +63,7 @@ export const NotificationProvider = ({ children }) => {
   const fetchAlerts = useCallback(async () => {
     if (!user) return;
     try {
-      const token = localStorage.getItem('crm_token');
+      const token = localStorage.getItem('brokerflow_token');
       const [alertsRes, countRes] = await Promise.all([
         axios.get(`${API_URL}/alerts`, { headers: { Authorization: `Bearer ${token}` } }),
         axios.get(`${API_URL}/alerts/unread-count`, { headers: { Authorization: `Bearer ${token}` } }),
@@ -82,7 +82,7 @@ export const NotificationProvider = ({ children }) => {
   // ── SSE Connection ────────────────────────────────────────────────────────
   useEffect(() => {
     if (!user) return;
-    const token = localStorage.getItem('crm_token');
+    const token = localStorage.getItem('brokerflow_token');
     if (!token) return;
 
     // Close any previous connection
@@ -128,7 +128,7 @@ export const NotificationProvider = ({ children }) => {
   // ── Actions ───────────────────────────────────────────────────────────────
   const resolveAlert = useCallback(async (id) => {
     try {
-      const token = localStorage.getItem('crm_token');
+      const token = localStorage.getItem('brokerflow_token');
       await axios.put(`${API_URL}/alerts/${id}/resolve`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -141,7 +141,7 @@ export const NotificationProvider = ({ children }) => {
 
   const markAllRead = useCallback(async () => {
     try {
-      const token = localStorage.getItem('crm_token');
+      const token = localStorage.getItem('brokerflow_token');
       await axios.put(`${API_URL}/alerts/read-all`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -154,7 +154,7 @@ export const NotificationProvider = ({ children }) => {
 
   const addAlert = useCallback(async (alertData) => {
     try {
-      const token = localStorage.getItem('crm_token');
+      const token = localStorage.getItem('brokerflow_token');
       const res = await axios.post(`${API_URL}/alerts`, alertData, {
         headers: { Authorization: `Bearer ${token}` }
       });

@@ -34,6 +34,17 @@ const getImages = (imagesStr) => {
   try { return JSON.parse(imagesStr); } catch(e) { return []; }
 };
 
+const formatRupees = (val) => {
+  if (!val) return '₹0';
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0
+  }).format(val);
+};
+
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
+
 export default function Properties() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,6 +61,8 @@ export default function Properties() {
   const [filters, setFilters] = useState({
     minArea: '', maxArea: '', size: '', minPrice: '', maxPrice: '', type: '', furnishing_status: '', location: ''
   });
+
+  const activeFilterCount = Object.values(filters).filter(v => v !== '').length;
 
   useEffect(() => { fetchProperties(); }, [filters]);
 
@@ -153,7 +166,13 @@ export default function Properties() {
         <h1 className="text-2xl font-bold text-slate-800">Properties</h1>
         <div className="flex items-center gap-2">
           <button onClick={() => setShowFilters(!showFilters)} className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors border ${showFilters ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}>
-            <Filter className="w-4 h-4" /> Filters
+            <Filter className="w-4 h-4" /> 
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="bg-blue-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
           </button>
           <button onClick={openAdd} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">
             <Plus className="w-4 h-4" /> Add Property
@@ -216,13 +235,17 @@ export default function Properties() {
             <div key={prop.id} onClick={() => setViewing(prop)} className="cursor-pointer bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow group">
               <div className="h-48 bg-slate-100 relative overflow-hidden">
                 {displayImage ? (
-                  <img src={`http://localhost:5000${displayImage}`} alt={prop.title} crossOrigin="anonymous" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src={`${API_BASE}${displayImage}`} alt={prop.title} crossOrigin="anonymous" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
                     <Home className="w-12 h-12 mb-2 opacity-50" />
                     <span className="text-xs font-medium">No Image</span>
                   </div>
                 )}
+                
+                <div className="absolute bottom-3 left-3 bg-blue-600 text-white px-3 py-1 rounded-lg shadow-lg font-bold text-sm">
+                  {formatRupees(prop.price)}
+                </div>
                 
                 {imgs.length > 1 && (
                   <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm">
@@ -231,7 +254,7 @@ export default function Properties() {
                 )}
                 
                 <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
-                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${prop.status === 'Available' ? 'bg-green-500 text-white' : prop.status === 'Sold' ? 'bg-red-500 text-white' : 'bg-slate-800 text-white'}`}>
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${prop.status === 'Available' ? 'bg-green-500' : prop.status === 'Sold' ? 'bg-red-500' : 'bg-slate-800'}`}>
                     {prop.status}
                   </span>
                   {prop.type && <span className="px-2.5 py-1 rounded-full text-xs font-bold shadow-sm bg-blue-600 text-white">{prop.type}</span>}
@@ -281,12 +304,9 @@ export default function Properties() {
           return (
           <div id={`pdf-${prop.id}`} key={`pdf-${prop.id}`} className="bg-white p-12 w-[800px] font-sans flex flex-col gap-6 text-slate-800 relative">
             {/* Watermark */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none overflow-hidden opacity-[0.04] z-0">
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none overflow-hidden opacity-[0.03] z-0">
               <div className="text-[140px] font-black text-slate-900 -rotate-45 select-none whitespace-nowrap tracking-widest">
-                CONFIDENTIAL
-              </div>
-              <div className="text-[80px] font-black text-slate-900 -rotate-45 select-none whitespace-nowrap tracking-widest mt-12">
-                INTERNAL USE ONLY
+                BrokerFlow
               </div>
             </div>
 
@@ -298,7 +318,7 @@ export default function Properties() {
                   <p className="text-xl text-slate-500">{prop.building_name} {prop.location && `| ${prop.location}`} {prop.address && `- ${prop.address}`}</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-black text-blue-600 mb-2">{formatRupees(prop.price)}</div>
+                  <div className="text-4xl font-black text-blue-600 mb-3">₹{Number(prop.price).toLocaleString()}</div>
                   <div className="inline-flex items-center gap-2 bg-slate-100 px-3 py-1 rounded-full mt-2">
                     <span className="w-2 h-2 rounded-full bg-green-500"></span>
                     <span className="text-sm font-bold text-slate-700 uppercase tracking-wider">{prop.status}</span>
@@ -311,19 +331,19 @@ export default function Properties() {
                 <div className={`grid ${imgs.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-4`}>
                   {displayImage && (
                     <div className="col-span-1">
-                      <img src={`http://localhost:5000${displayImage}`} crossOrigin="anonymous" className="w-full h-64 object-cover rounded-xl shadow-sm" />
+                      <img src={`${API_BASE}${displayImage}`} crossOrigin="anonymous" className="w-full h-64 object-cover rounded-xl shadow-sm" />
                     </div>
                   )}
                   {imgs.length > 1 && (
                     <div className="col-span-1">
-                      <img src={`http://localhost:5000${imgs[1]}`} crossOrigin="anonymous" className="w-full h-64 object-cover rounded-xl shadow-sm" />
+                      <img src={`${API_BASE}${imgs[1]}`} crossOrigin="anonymous" className="w-full h-64 object-cover rounded-xl shadow-sm" />
                     </div>
                   )}
                 </div>
                 {imgs.length > 2 && (
                   <div className="grid grid-cols-4 gap-4">
                     {imgs.slice(2).map((img, idx) => (
-                      <img key={idx} src={`http://localhost:5000${img}`} crossOrigin="anonymous" className="w-full h-32 object-cover rounded-xl shadow-sm" />
+                      <img key={idx} src={`${API_BASE}${img}`} crossOrigin="anonymous" className="w-full h-32 object-cover rounded-xl shadow-sm" />
                     ))}
                   </div>
                 )}
@@ -383,7 +403,7 @@ export default function Properties() {
 
               {/* Footer */}
               <div className="mt-auto pt-8 text-center text-slate-400 text-sm font-medium border-t border-slate-100">
-                Generated by Real Estate CRM
+                Generated by BrokerFlow
               </div>
             </div>
           </div>
@@ -405,7 +425,7 @@ export default function Properties() {
                     <p className="text-lg text-slate-500">{prop.building_name} {prop.location && `| ${prop.location}`} {prop.address && `- ${prop.address}`}</p>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-black text-blue-600 mb-2">{formatRupees(prop.price)}</div>
+                    <div className="text-4xl font-black text-blue-600 mb-3">₹{Number(prop.price).toLocaleString()}</div>
                     <div className="inline-flex items-center gap-2 bg-slate-100 px-3 py-1 rounded-full mt-2">
                       <span className={`w-2 h-2 rounded-full ${prop.status === 'Available' ? 'bg-green-500' : prop.status === 'Sold' ? 'bg-red-500' : 'bg-slate-800'}`}></span>
                       <span className="text-sm font-bold text-slate-700 uppercase tracking-wider">{prop.status}</span>
@@ -417,19 +437,19 @@ export default function Properties() {
                 <div className={`grid ${imgs.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-4`}>
                   {displayImage && (
                     <div className="col-span-1">
-                      <img src={`http://localhost:5000${displayImage}`} crossOrigin="anonymous" className="w-full h-64 object-cover rounded-xl shadow-sm" />
+                      <img src={`${API_BASE}${displayImage}`} crossOrigin="anonymous" className="w-full h-64 object-cover rounded-xl shadow-sm" />
                     </div>
                   )}
                   {imgs.length > 1 && (
                     <div className="col-span-1">
-                      <img src={`http://localhost:5000${imgs[1]}`} crossOrigin="anonymous" className="w-full h-64 object-cover rounded-xl shadow-sm" />
+                      <img src={`${API_BASE}${imgs[1]}`} crossOrigin="anonymous" className="w-full h-64 object-cover rounded-xl shadow-sm" />
                     </div>
                   )}
                 </div>
                 {imgs.length > 2 && (
                   <div className="flex gap-2 overflow-x-auto pb-2">
                     {imgs.slice(2).map((img, idx) => (
-                      <img key={idx} src={`http://localhost:5000${img}`} crossOrigin="anonymous" className="h-24 w-32 object-cover rounded-lg shadow-sm flex-shrink-0" />
+                      <img key={idx} src={`${API_BASE}${img}`} crossOrigin="anonymous" className="h-24 w-32 object-cover rounded-lg shadow-sm flex-shrink-0" />
                     ))}
                   </div>
                 )}

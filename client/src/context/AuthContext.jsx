@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const token = localStorage.getItem('crm_token');
+      const token = localStorage.getItem('brokerflow_token');
       if (token) {
         try {
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
           setUser(response.data.user);
         } catch (error) {
           console.error("Token invalid or expired", error);
-          localStorage.removeItem('crm_token');
+          localStorage.removeItem('brokerflow_token');
           delete axios.defaults.headers.common['Authorization'];
         }
       }
@@ -30,14 +30,51 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+      if (response.data.requires2FA) {
+        return { requires2FA: true, email: response.data.email };
+      }
       const { token, user } = response.data;
-      localStorage.setItem('crm_token', token);
+      localStorage.setItem('brokerflow_token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(user);
-      return true;
+      return { success: true };
     } catch (error) {
       console.error('Login failed', error);
-      return false;
+      return { success: false, message: error.response?.data?.message || 'Login failed' };
+    }
+  };
+
+  const verifyOTP = async (email, otp) => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/verify-otp`, { email, otp });
+      const { token, user } = response.data;
+      localStorage.setItem('brokerflow_token', token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      setUser(user);
+      return { success: true };
+    } catch (error) {
+      console.error('OTP verification failed', error);
+      return { success: false, message: error.response?.data?.message || 'Invalid code' };
+    }
+  };
+
+  const forgotPassword = async (email) => {
+    try {
+      await axios.post(`${API_URL}/auth/forgot-password`, { email });
+      return { success: true };
+    } catch (error) {
+      console.error('Forgot password failed', error);
+      return { success: false, message: error.response?.data?.message || 'Failed to send reset email' };
+    }
+  };
+
+  const resetPassword = async (token, password) => {
+    try {
+      await axios.post(`${API_URL}/auth/reset-password`, { token, password });
+      return { success: true };
+    } catch (error) {
+      console.error('Reset password failed', error);
+      return { success: false, message: error.response?.data?.message || 'Failed to reset password' };
     }
   };
 
@@ -45,7 +82,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await axios.post(`${API_URL}/auth/register`, { name, email, password, role, phone });
       const { token, user } = response.data;
-      localStorage.setItem('crm_token', token);
+      localStorage.setItem('brokerflow_token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(user);
       return { success: true };
@@ -56,7 +93,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('crm_token');
+    localStorage.removeItem('brokerflow_token');
     delete axios.defaults.headers.common['Authorization'];
     setUser(null);
   };
@@ -77,7 +114,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading, updateUser }}>
+    <AuthContext.Provider value={{ user, login, verifyOTP, forgotPassword, resetPassword, register, logout, loading, updateUser }}>
       {!loading && children}
     </AuthContext.Provider>
   );

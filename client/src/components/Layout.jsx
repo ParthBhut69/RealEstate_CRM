@@ -17,7 +17,7 @@ export default function Layout() {
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold">C</span>
           </div>
-          <span className="text-xl font-bold text-slate-800">CRM</span>
+          <span className="text-xl font-bold text-blue-600">BrokerFlow</span>
         </div>
         
         <div className="flex items-center gap-6 flex-1 justify-center">
