@@ -45,7 +45,8 @@ export default function ProjectForm({ isEdit = false }) {
       });
       
       if (data.images) {
-        setPreviews(data.images.map(img => `http://localhost:5000${img}`));
+        const API_BASE_URL = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
+        setPreviews(data.images.map(img => `${API_BASE_URL}${img}`));
       }
     } catch (err) {
       setError('Failed to load project details');
