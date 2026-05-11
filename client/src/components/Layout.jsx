@@ -1,13 +1,16 @@
 import { Outlet, NavLink } from 'react-router-dom';
-import { Home, Bell, User, PlusCircle, Briefcase } from 'lucide-react';
+import { Home, Bell, User, PlusCircle, Briefcase, Shield } from 'lucide-react';
 import { useState } from 'react';
 import QuickAddModal from './QuickAddModal';
 import NotificationToast from './NotificationToast';
 import { useNotifications } from '../context/NotificationContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function Layout() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { unreadCount } = useNotifications();
+  const { user } = useAuth();
+  const isAdmin = user?.role?.toLowerCase() === 'admin';
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -61,6 +64,20 @@ export default function Layout() {
             </div>
             <span className="font-medium">Alerts</span>
           </NavLink>
+
+          {isAdmin && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                `flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${
+                  isActive ? 'text-blue-600 bg-blue-50' : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50'
+                }`
+              }
+            >
+              <Shield className="w-5 h-5" />
+              <span className="font-medium">Admin</span>
+            </NavLink>
+          )}
         </div>
 
         <div>
@@ -115,6 +132,13 @@ export default function Layout() {
           </div>
           <span className="text-[10px] mt-1 font-medium">Alerts</span>
         </NavLink>
+
+        {isAdmin && (
+          <NavLink to="/admin" className={({ isActive }) => `flex flex-col items-center justify-center w-16 h-full ${isActive ? 'text-blue-600' : 'text-slate-500'}`}>
+            <Shield className="w-6 h-6" />
+            <span className="text-[10px] mt-1 font-medium">Admin</span>
+          </NavLink>
+        )}
 
         <NavLink to="/profile" className={({ isActive }) => `flex flex-col items-center justify-center w-16 h-full ${isActive ? 'text-blue-600' : 'text-slate-500'}`}>
           <User className="w-6 h-6" />

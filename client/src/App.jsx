@@ -14,6 +14,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import AdminPanel from './pages/AdminPanel';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
         <Route path="projects/new" element={<ProjectForm />} />
         <Route path="projects/:id" element={<ProjectDetails />} />
         <Route path="projects/:id/edit" element={<ProjectForm isEdit={true} />} />
+        <Route path="admin" element={<AdminPanel />} />
       </Route>
     </Routes>
   );

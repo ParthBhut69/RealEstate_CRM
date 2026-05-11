@@ -24,6 +24,7 @@ app.use('/api/deals', require('./routes/deals'));
 app.use('/api/loanInquiries', require('./routes/loanInquiries'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/alerts', require('./routes/alerts'));
+app.use('/api/admin', require('./routes/admin'));
 
 app.get('/', (req, res) => {
   res.send('BrokerFlow API - Premium Real Estate Management');
