@@ -40,11 +40,16 @@ export default function Home() {
         </div>
       </div>
 
+<<<<<<< HEAD
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+=======
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+>>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
         {modules.map((mod) => (
           <Link 
             key={mod.id} 
             to={mod.link}
+<<<<<<< HEAD
             className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-100 transition-all group"
           >
             <div className="flex items-start justify-between">
@@ -54,6 +59,17 @@ export default function Home() {
               </div>
               <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center ${mod.bg} ${mod.color} group-hover:scale-110 transition-transform shrink-0`}>
                 <mod.icon className="w-5 h-5 md:w-6 h-6" />
+=======
+            className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-100 transition-all group"
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-500 mb-1">{mod.title}</p>
+                <h3 className="text-3xl font-bold text-slate-800">{mod.count}</h3>
+              </div>
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${mod.bg} ${mod.color} group-hover:scale-110 transition-transform`}>
+                <mod.icon className="w-6 h-6" />
+>>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
               </div>
             </div>
             <div className="mt-4 flex items-center text-sm text-blue-600 font-medium group-hover:translate-x-1 transition-transform">

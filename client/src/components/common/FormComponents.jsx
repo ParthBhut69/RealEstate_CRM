@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import { PlusCircle, Trash2 } from 'lucide-react';
+=======
+import React from 'react';
+import { PlusCircle } from 'lucide-react';
+>>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
 
 export const FormCard = ({ title, subtitle, icon: Icon, children }) => (
   <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -63,6 +68,7 @@ export const Textarea = React.forwardRef((props, ref) => (
   />
 ));
 
+<<<<<<< HEAD
 export const CheckboxGroup = React.forwardRef(({ options, value, onChange, ...props }, ref) => {
   const [selected, setSelected] = useState(value ? (typeof value === 'string' ? value.split(',').map(s=>s.trim()) : value) : []);
 
@@ -150,6 +156,30 @@ export const FileInput = React.forwardRef(({ onChange, value, ...props }, ref) =
     </div>
   );
 });
+=======
+export const FileInput = React.forwardRef(({ onChange, ...props }, ref) => (
+  <div className="relative group">
+    <input
+      type="file"
+      ref={ref}
+      onChange={onChange}
+      {...props}
+      className="hidden"
+      id="file-upload"
+    />
+    <label
+      htmlFor="file-upload"
+      className="flex flex-col items-center justify-center w-full p-8 border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50 hover:bg-blue-50 hover:border-blue-300 transition-all cursor-pointer group/label"
+    >
+      <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-3 group-hover/label:scale-110 transition-transform">
+        <PlusCircle className="w-6 h-6 text-blue-600" />
+      </div>
+      <span className="text-sm font-black text-slate-600">Click to upload photos</span>
+      <span className="text-xs text-slate-400 font-medium mt-1">PNG, JPG or WEBP (Max 5MB)</span>
+    </label>
+  </div>
+));
+>>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
 
 export const Button = ({ children, loading, variant = 'primary', icon: Icon, ...props }) => {
   const variants = {

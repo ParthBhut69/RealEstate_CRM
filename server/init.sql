@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS properties (
     area DECIMAL(10, 2),
     size VARCHAR(50),
     type VARCHAR(50),
+<<<<<<< HEAD
     property_for VARCHAR(50),
     configuration VARCHAR(50),
     carpet_area DECIMAL(10, 2),
@@ -34,6 +35,8 @@ CREATE TABLE IF NOT EXISTS properties (
     oc_status VARCHAR(20),
     youtube_link VARCHAR(255),
     instagram_link VARCHAR(255),
+=======
+>>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
     amenities TEXT,
     image_url VARCHAR(255),
     images TEXT,
@@ -44,6 +47,7 @@ CREATE TABLE IF NOT EXISTS properties (
 CREATE TABLE IF NOT EXISTS inquiries (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     property_id INTEGER REFERENCES properties(id) ON DELETE SET NULL,
+<<<<<<< HEAD
     client_name VARCHAR(255) NOT NULL,
     contact_number VARCHAR(255) NOT NULL,
     alternate_contact_number VARCHAR(50),
@@ -59,6 +63,11 @@ CREATE TABLE IF NOT EXISTS inquiries (
     followup_status VARCHAR(50) DEFAULT 'New',
     last_followup_date DATETIME,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+=======
+    customer_name VARCHAR(255) NOT NULL,
+    contact_info VARCHAR(255) NOT NULL,
+    status VARCHAR(50) DEFAULT 'New',
+>>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

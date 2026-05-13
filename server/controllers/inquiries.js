@@ -2,6 +2,7 @@ const { pool } = require('../db');
 
 exports.getAll = async (req, res) => {
   try {
+<<<<<<< HEAD
     const { 
       page = 1, 
       limit = 10, 
@@ -117,6 +118,10 @@ exports.getAll = async (req, res) => {
         totalPages: Math.ceil(countRows[0].total / limit)
       }
     });
+=======
+    const { rows } = await pool.query('SELECT * FROM inquiries ORDER BY created_at DESC');
+    res.json(rows);
+>>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -135,6 +140,7 @@ exports.getById = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
+<<<<<<< HEAD
     const { 
       property_id, client_name, contact_number, alternate_contact_number, 
       email_id, inquiry_type, property_size, budget, 
@@ -158,6 +164,13 @@ exports.create = async (req, res) => {
       next_followup_date, followup_status || 'New'
     ]);
 
+=======
+    const { property_id, customer_name, contact_info, status } = req.body;
+    const { lastID } = await pool.query(
+      'INSERT INTO inquiries (property_id, customer_name, contact_info, status) VALUES (?, ?, ?, ?)',
+      [property_id, customer_name, contact_info, status || 'New']
+    );
+>>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
     const { rows } = await pool.query('SELECT * FROM inquiries WHERE id = ?', [lastID]);
     res.status(201).json(rows[0]);
   } catch (err) {
@@ -168,6 +181,7 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
+<<<<<<< HEAD
     const { 
       property_id, client_name, contact_number, alternate_contact_number, 
       email_id, inquiry_type, property_size, budget, 
@@ -191,6 +205,13 @@ exports.update = async (req, res) => {
       next_followup_date, followup_status, id
     ]);
 
+=======
+    const { property_id, customer_name, contact_info, status } = req.body;
+    const { rowCount } = await pool.query(
+      'UPDATE inquiries SET property_id = ?, customer_name = ?, contact_info = ?, status = ? WHERE id = ?',
+      [property_id, customer_name, contact_info, status, id]
+    );
+>>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
     if (rowCount === 0) return res.status(404).json({ error: 'Inquiry not found' });
     const { rows } = await pool.query('SELECT * FROM inquiries WHERE id = ?', [id]);
     res.json(rows[0]);
@@ -213,7 +234,11 @@ exports.remove = async (req, res) => {
 exports.getNotes = async (req, res) => {
   try {
     const { id } = req.params;
+<<<<<<< HEAD
     const { rows } = await pool.query('SELECT * FROM inquiry_notes WHERE inquiry_id = ? ORDER BY created_at DESC', [id]);
+=======
+    const { rows } = await pool.query('SELECT * FROM inquiry_notes WHERE inquiry_id = ? ORDER BY created_at ASC', [id]);
+>>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -230,10 +255,13 @@ exports.addNote = async (req, res) => {
       'INSERT INTO inquiry_notes (inquiry_id, note) VALUES (?, ?)',
       [id, note]
     );
+<<<<<<< HEAD
 
     // Update lastFollowupDate in inquiries table
     await pool.query('UPDATE inquiries SET last_followup_date = CURRENT_TIMESTAMP WHERE id = ?', [id]);
 
+=======
+>>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
     const { rows } = await pool.query('SELECT * FROM inquiry_notes WHERE id = ?', [lastID]);
     res.status(201).json(rows[0]);
   } catch (err) {
