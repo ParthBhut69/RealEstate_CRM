@@ -1,16 +1,8 @@
-<<<<<<< HEAD
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { Home, Briefcase, MessageSquare, CheckSquare, ArrowLeft, Save, Building2, MapPin, DollarSign, User, Calendar, Type, Video, Link as LinkIcon, Car, Award } from 'lucide-react';
 import { FormCard, FormGroup, Input, Select, Textarea, Button, FileInput, CheckboxGroup } from '../components/common/FormComponents';
-=======
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { Home, Briefcase, MessageSquare, CheckSquare, ArrowLeft, Save, Building2, MapPin, DollarSign, User, Calendar, Type } from 'lucide-react';
-import { FormCard, FormGroup, Input, Select, Textarea, Button, FileInput } from '../components/common/FormComponents';
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
 import api from '../api/axios';
 
 const CONFIG = {
@@ -21,7 +13,6 @@ const CONFIG = {
     endpoint: '/properties',
     fields: [
       { name: 'title', label: 'Property Title', icon: Type, required: true },
-<<<<<<< HEAD
       { name: 'building_name', label: 'Building Name', icon: Building2, required: true },
       { name: 'property_for', label: 'Property For', type: 'select', required: true, options: [
         { value: '', label: 'Select...' },
@@ -68,24 +59,10 @@ const CONFIG = {
         { value: '', label: 'Select...' },
         { value: 'Yes', label: 'Yes' },
         { value: 'No', label: 'No' }
-=======
-      { name: 'building_name', label: 'Building/Project Name', icon: Building2 },
-      { name: 'price', label: 'Asking Price', icon: DollarSign, type: 'number', required: true },
-      { name: 'location', label: 'General Location', icon: MapPin },
-      { name: 'address', label: 'Full Address', icon: MapPin },
-      { name: 'area', label: 'Area (sq.ft)', icon: Building2, type: 'number' },
-      { name: 'size', label: 'Configuration', type: 'select', options: [
-        { value: '', label: 'Select BHK...' },
-        { value: '1 BHK', label: '1 BHK' },
-        { value: '2 BHK', label: '2 BHK' },
-        { value: '3 BHK', label: '3 BHK' },
-        { value: '4 BHK+', label: '4 BHK+' }
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
       ]},
       { name: 'status', label: 'Listing Status', type: 'select', options: [
         { value: 'Available', label: 'Available' },
         { value: 'Sold', label: 'Sold' },
-<<<<<<< HEAD
         { value: 'Rented', label: 'Rented' },
         { value: 'Under Negotiation', label: 'Under Negotiation' }
       ]},
@@ -106,20 +83,6 @@ const CONFIG = {
       ]},
       { name: 'youtube_link', label: 'YouTube Video Link', icon: Video, type: 'url' },
       { name: 'instagram_link', label: 'Instagram Link', icon: LinkIcon, type: 'url' },
-=======
-        { value: 'Rented', label: 'Rented' }
-      ]},
-      { name: 'type', label: 'Category', type: 'select', options: [
-        { value: 'Buy', label: 'For Sale' },
-        { value: 'Rent', label: 'For Rent' }
-      ]},
-      { name: 'furnishing_status', label: 'Furnishing', type: 'select', options: [
-        { value: 'Unfurnished', label: 'Unfurnished' },
-        { value: 'Semi-Furnished', label: 'Semi-Furnished' },
-        { value: 'Furnished', label: 'Furnished' }
-      ]},
-      { name: 'amenities', label: 'Amenities (Comma separated)', icon: CheckSquare },
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
       { name: 'images', label: 'Property Photos', type: 'file' },
       { name: 'description', label: 'Detailed Description', type: 'textarea' }
     ]
@@ -160,7 +123,6 @@ const CONFIG = {
     icon: MessageSquare,
     endpoint: '/inquiries',
     fields: [
-<<<<<<< HEAD
       { name: 'client_name', label: 'Client Name', icon: User, required: true },
       { name: 'contact_number', label: 'Contact Number', icon: MapPin, required: true },
       { name: 'alternate_contact_number', label: 'Alternate Contact Number', icon: MapPin },
@@ -206,17 +168,6 @@ const CONFIG = {
         { value: 'Not Interested', label: 'Not Interested' }
       ]},
       { name: 'comments', label: 'Comments / Notes', type: 'textarea' }
-=======
-      { name: 'customer_name', label: 'Customer Full Name', icon: User, required: true },
-      { name: 'contact_info', label: 'Contact Details (Email/Phone)', icon: MapPin, required: true },
-      { name: 'property_id', label: 'Property ID (Optional)', type: 'number' },
-      { name: 'status', label: 'Lead Status', type: 'select', options: [
-        { value: 'New', label: 'New Lead' },
-        { value: 'Follow Up', label: 'Follow Up' },
-        { value: 'Negotiation', label: 'Negotiation' },
-        { value: 'Closed', label: 'Closed' }
-      ]}
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
     ]
   },
   task: {
@@ -236,22 +187,15 @@ const CONFIG = {
   }
 };
 
-<<<<<<< HEAD
 export default function GenericFormPage({ type, isEdit }) {
   const navigate = useNavigate();
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
-=======
-export default function GenericFormPage({ type }) {
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
   const [error, setError] = useState('');
   const [fileList, setFileList] = useState([]);
   const config = CONFIG[type];
 
-<<<<<<< HEAD
   const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
 
   useEffect(() => {
@@ -269,56 +213,56 @@ export default function GenericFormPage({ type }) {
       setFetching(false);
     }
   }, [isEdit, id, config.endpoint, reset]);
-=======
-  const { register, handleSubmit, formState: { errors } } = useForm();
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
 
   const onSubmit = async (data) => {
     try {
       setLoading(true);
       setError('');
       
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-<<<<<<< HEAD
-        if (key !== 'images') formData.append(key, value || '');
-=======
-        if (key !== 'images') formData.append(key, value);
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
-      });
+      let payload;
+      let headers = {};
 
       if (fileList.length > 0) {
+        // Use FormData for file uploads
+        const formData = new FormData();
+        Object.entries(data).forEach(([key, value]) => {
+          if (key !== 'images') {
+            // Handle arrays (like amenities) for FormData
+            if (Array.isArray(value)) {
+              formData.append(key, value.join(','));
+            } else {
+              formData.append(key, value || '');
+            }
+          }
+        });
+
         Array.from(fileList).forEach(file => {
           formData.append('images', file);
         });
+        payload = formData;
+      } else {
+        // Use JSON for standard data (more compatible with backend)
+        payload = data;
       }
 
-<<<<<<< HEAD
       if (isEdit) {
-        await api.put(`${config.endpoint}/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+        await api.put(`${config.endpoint}/${id}`, payload);
       } else {
-        await api.post(config.endpoint, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+        await api.post(config.endpoint, payload);
       }
-=======
-      await api.post(config.endpoint, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
       
       navigate(-1);
     } catch (err) {
       console.error('Submission failed', err);
-      setError(err.response?.data?.message || 'Failed to save data. Please check all fields.');
+      // Try to get specific error message from server
+      const serverError = err.response?.data?.error || err.response?.data?.message;
+      setError(serverError || 'Failed to save data. Please check all fields.');
     } finally {
       setLoading(false);
     }
   };
 
-<<<<<<< HEAD
   if (!config || fetching) return <div className="p-8 text-center text-slate-500 font-medium">Loading...</div>;
-=======
-  if (!config) return null;
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 font-sans">
@@ -333,11 +277,8 @@ export default function GenericFormPage({ type }) {
       </button>
 
       <FormCard 
-<<<<<<< HEAD
         title={isEdit ? `Edit ${config.title.replace('Add New ', '')}` : config.title} 
-=======
-        title={config.title} 
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
+
         subtitle={config.subtitle} 
         icon={config.icon}
       >
@@ -350,11 +291,7 @@ export default function GenericFormPage({ type }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {config.fields.map((field) => (
-<<<<<<< HEAD
               <div key={field.name} className={field.type === 'textarea' || field.type === 'checkbox-group' ? 'md:col-span-2' : ''}>
-=======
-              <div key={field.name} className={field.type === 'textarea' ? 'md:col-span-2' : ''}>
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
                 <FormGroup label={field.label} error={errors[field.name]?.message} required={field.required}>
                   {field.type === 'select' ? (
                     <Select 
@@ -366,7 +303,6 @@ export default function GenericFormPage({ type }) {
                       placeholder={`Enter ${field.label.toLowerCase()}...`}
                       {...register(field.name, { required: field.required && `${field.label} is required` })} 
                     />
-<<<<<<< HEAD
                   ) : field.type === 'checkbox-group' ? (
                     <Controller
                       name={field.name}
@@ -386,12 +322,6 @@ export default function GenericFormPage({ type }) {
                           value={fileList.length > 0 ? fileList : null}
                         />
                       )}
-=======
-                  ) : field.type === 'file' ? (
-                    <FileInput 
-                      multiple
-                      onChange={(e) => setFileList(e.target.files)}
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
                     />
                   ) : (
                     <Input 

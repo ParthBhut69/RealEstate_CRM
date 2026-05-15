@@ -2,7 +2,6 @@ const { pool } = require('../db');
 
 exports.getAll = async (req, res) => {
   try {
-<<<<<<< HEAD
     const { configuration, minPrice, maxPrice, property_for, furnishing_status, location, parking_type, oc_status, building_name, address } = req.query;
     let query = 'SELECT * FROM properties WHERE 1=1';
     let params = [];
@@ -17,20 +16,6 @@ exports.getAll = async (req, res) => {
     if (oc_status) { query += ' AND oc_status = ?'; params.push(oc_status); }
     if (building_name) { query += ' AND building_name LIKE ?'; params.push(`%${building_name}%`); }
     if (address) { query += ' AND address LIKE ?'; params.push(`%${address}%`); }
-=======
-    const { minArea, maxArea, size, minPrice, maxPrice, type, furnishing_status, location } = req.query;
-    let query = 'SELECT * FROM properties WHERE 1=1';
-    let params = [];
-    
-    if (minArea) { query += ' AND area >= ?'; params.push(minArea); }
-    if (maxArea) { query += ' AND area <= ?'; params.push(maxArea); }
-    if (size) { query += ' AND size = ?'; params.push(size); }
-    if (minPrice) { query += ' AND price >= ?'; params.push(minPrice); }
-    if (maxPrice) { query += ' AND price <= ?'; params.push(maxPrice); }
-    if (type) { query += ' AND type = ?'; params.push(type); }
-    if (furnishing_status) { query += ' AND furnishing_status = ?'; params.push(furnishing_status); }
-    if (location) { query += ' AND location LIKE ?'; params.push(`%${location}%`); }
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
     
     query += ' ORDER BY created_at DESC';
     const { rows } = await pool.query(query, params);
@@ -53,11 +38,7 @@ exports.getById = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-<<<<<<< HEAD
     const { title, description, price, status, building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link } = req.body || {};
-=======
-    const { title, description, price, status, building_name, address, location, area, size, type, amenities, furnishing_status } = req.body || {};
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
     let image_url = null;
     let images = '[]';
     if (req.files && req.files.length > 0) {
@@ -65,7 +46,6 @@ exports.create = async (req, res) => {
       image_url = paths[0];
       images = JSON.stringify(paths);
     }
-<<<<<<< HEAD
     // Use RETURNING id for PostgreSQL to get inserted id
     const insertSql = 'INSERT INTO properties (title, description, price, status, building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link, image_url, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
     let insertParams = [title, description, price || 0, status || 'Available', building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link, image_url, images];
@@ -82,14 +62,6 @@ exports.create = async (req, res) => {
       const { rows } = await pool.query('SELECT * FROM properties WHERE id = ?', [lastID]);
       res.status(201).json(rows[0]);
     }
-=======
-    const { lastID } = await pool.query(
-      'INSERT INTO properties (title, description, price, status, building_name, address, location, area, size, type, amenities, furnishing_status, image_url, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [title, description, price, status || 'Available', building_name, address, location, area, size, type, amenities, furnishing_status, image_url, images]
-    );
-    const { rows } = await pool.query('SELECT * FROM properties WHERE id = ?', [lastID]);
-    res.status(201).json(rows[0]);
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -98,17 +70,10 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-<<<<<<< HEAD
     const { title, description, price, status, building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link } = req.body;
     
     let query = 'UPDATE properties SET title = ?, description = ?, price = ?, status = ?, building_name = ?, address = ?, location = ?, property_for = ?, configuration = ?, carpet_area = ?, price_in_cr = ?, amenities = ?, furnishing_status = ?, parking_type = ?, oc_status = ?, youtube_link = ?, instagram_link = ?';
     let params = [title, description, price || 0, status, building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link];
-=======
-    const { title, description, price, status, building_name, address, location, area, size, type, amenities, furnishing_status } = req.body;
-    
-    let query = 'UPDATE properties SET title = ?, description = ?, price = ?, status = ?, building_name = ?, address = ?, location = ?, area = ?, size = ?, type = ?, amenities = ?, furnishing_status = ?';
-    let params = [title, description, price, status, building_name, address, location, area, size, type, amenities, furnishing_status];
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
     
     if (req.files && req.files.length > 0) {
       const paths = req.files.map(f => `/uploads/properties/${f.filename}`);

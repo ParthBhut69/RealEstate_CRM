@@ -33,13 +33,9 @@ function App() {
         <Route path="alerts" element={<Alerts />} />
         <Route path="profile" element={<Profile />} />
         <Route path="properties" element={<Properties />} />
-<<<<<<< HEAD
         <Route path="properties/:id/edit" element={<GenericFormPage type="property" isEdit={true} />} />
         <Route path="inquiries" element={<Inquiries />} />
         <Route path="inquiries/:id/edit" element={<GenericFormPage type="inquiry" isEdit={true} />} />
-=======
-        <Route path="inquiries" element={<Inquiries />} />
->>>>>>> dbb33eb4a79c8ab4bc7e02b76e1c4bdd46ff9726
         <Route path="tasks" element={<Tasks />} />
         <Route path="projects" element={<ProjectsList />} />
         <Route path="projects/new" element={<GenericFormPage type="project" />} />
