@@ -140,7 +140,11 @@ exports.create = async (req, res) => {
       email_id, inquiry_type, property_size, budget, 
       preferred_location, area, inquiry_source, comments, 
       next_followup_date, followup_status 
-    } = req.body;
+    } = req.body || {};
+
+    if (!client_name || !contact_number) {
+      return res.status(400).json({ error: 'Client Name and Contact Number are required' });
+    }
 
     const query = `
       INSERT INTO inquiries (
@@ -172,7 +176,7 @@ exports.update = async (req, res) => {
       email_id, inquiry_type, property_size, budget, 
       preferred_location, area, inquiry_source, comments, 
       next_followup_date, followup_status 
-    } = req.body;
+    } = req.body || {};
 
     const query = `
       UPDATE inquiries SET 

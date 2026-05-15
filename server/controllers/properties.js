@@ -38,6 +38,7 @@ exports.getById = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
+    console.log('--- Property Create Req Body ---', req.body);
     const { title, description, price, status, building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link } = req.body || {};
     let image_url = null;
     let images = '[]';
@@ -46,9 +47,11 @@ exports.create = async (req, res) => {
       image_url = paths[0];
       images = JSON.stringify(paths);
     }
+    const calculatedPrice = price || (price_in_cr ? parseFloat(price_in_cr) * 10000000 : 0);
+    
     // Use RETURNING id for PostgreSQL to get inserted id
     const insertSql = 'INSERT INTO properties (title, description, price, status, building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link, image_url, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    let insertParams = [title, description, price || 0, status || 'Available', building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link, image_url, images];
+    let insertParams = [title, description, calculatedPrice, status || 'Available', building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link, image_url, images];
     let result;
     if (process.env.DATABASE_URL) {
       // PostgreSQL: add RETURNING id
@@ -72,8 +75,10 @@ exports.update = async (req, res) => {
     const { id } = req.params;
     const { title, description, price, status, building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link } = req.body;
     
+    const calculatedPrice = price || (price_in_cr ? parseFloat(price_in_cr) * 10000000 : 0);
+    
     let query = 'UPDATE properties SET title = ?, description = ?, price = ?, status = ?, building_name = ?, address = ?, location = ?, property_for = ?, configuration = ?, carpet_area = ?, price_in_cr = ?, amenities = ?, furnishing_status = ?, parking_type = ?, oc_status = ?, youtube_link = ?, instagram_link = ?';
-    let params = [title, description, price || 0, status, building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link];
+    let params = [title, description, calculatedPrice, status, building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link];
     
     if (req.files && req.files.length > 0) {
       const paths = req.files.map(f => `/uploads/properties/${f.filename}`);
