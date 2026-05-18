@@ -4,7 +4,7 @@ services:
     name: brokerflow-api
     env: node
     plan: free
-    buildCommand: cd server && npm install && npm rebuild sqlite3 --build-from-source
+    buildCommand: cd server && npm install
     startCommand: cd server && npm start
     envVars:
       - key: NODE_VERSION
