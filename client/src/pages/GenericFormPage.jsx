@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { Home, Briefcase, MessageSquare, CheckSquare, ArrowLeft, Save, Building2, MapPin, DollarSign, User, Calendar, Type } from 'lucide-react';
-import { FormCard, FormGroup, Input, Select, Textarea, Button, FileInput } from '../components/common/FormComponents';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useForm, Controller } from 'react-hook-form';
+import { Home, Briefcase, MessageSquare, CheckSquare, ArrowLeft, Save, Building2, MapPin, DollarSign, User, Calendar, Type, Video, Link as LinkIcon, Car, Award } from 'lucide-react';
+import { FormCard, FormGroup, Input, Select, Textarea, Button, FileInput, CheckboxGroup } from '../components/common/FormComponents';
 import api from '../api/axios';
 
 const CONFIG = {
@@ -13,33 +13,76 @@ const CONFIG = {
     endpoint: '/properties',
     fields: [
       { name: 'title', label: 'Property Title', icon: Type, required: true },
-      { name: 'building_name', label: 'Building/Project Name', icon: Building2 },
-      { name: 'price', label: 'Asking Price', icon: DollarSign, type: 'number', required: true },
-      { name: 'location', label: 'General Location', icon: MapPin },
-      { name: 'address', label: 'Full Address', icon: MapPin },
-      { name: 'area', label: 'Area (sq.ft)', icon: Building2, type: 'number' },
-      { name: 'size', label: 'Configuration', type: 'select', options: [
-        { value: '', label: 'Select BHK...' },
+      { name: 'building_name', label: 'Building Name', icon: Building2, required: true },
+      { name: 'property_for', label: 'Property For', type: 'select', required: true, options: [
+        { value: '', label: 'Select...' },
+        { value: 'Buy', label: 'Buy' },
+        { value: 'Rent', label: 'Rent' }
+      ]},
+      { name: 'configuration', label: 'Configuration', type: 'select', required: true, options: [
+        { value: '', label: 'Select...' },
         { value: '1 BHK', label: '1 BHK' },
         { value: '2 BHK', label: '2 BHK' },
         { value: '3 BHK', label: '3 BHK' },
-        { value: '4 BHK+', label: '4 BHK+' }
+        { value: '4 BHK', label: '4 BHK' },
+        { value: 'Studio', label: 'Studio' },
+        { value: 'Penthouse', label: 'Penthouse' },
+        { value: 'Duplex', label: 'Duplex' },
+        { value: 'Commercial', label: 'Commercial' }
+      ]},
+      { name: 'location', label: 'Location', type: 'select', required: true, options: [
+        { value: '', label: 'Select...' },
+        { value: 'BVI West', label: 'BVI West' },
+        { value: 'BVI East', label: 'BVI East' },
+        { value: 'KVI West', label: 'KVI West' },
+        { value: 'KVI East', label: 'KVI East' },
+        { value: 'Others', label: 'Others' }
+      ]},
+      { name: 'address', label: 'Full Address', icon: MapPin },
+      { name: 'carpet_area', label: 'Carpet Area (Sq.ft)', icon: Building2, type: 'number', required: true },
+      { name: 'price_in_cr', label: 'Price (In Cr)', icon: DollarSign, type: 'number', step: '0.01', required: true },
+      { name: 'furnishing_status', label: 'Furnishing', type: 'select', options: [
+        { value: '', label: 'Select...' },
+        { value: 'Unfurnished', label: 'Unfurnished' },
+        { value: 'Semi Furnished', label: 'Semi Furnished' },
+        { value: 'Fully Furnished', label: 'Fully Furnished' }
+      ]},
+      { name: 'parking_type', label: 'Parking Type', type: 'select', options: [
+        { value: '', label: 'Select...' },
+        { value: 'No Parking', label: 'No Parking' },
+        { value: 'Open Parking', label: 'Open Parking' },
+        { value: 'Covered Parking', label: 'Covered Parking' },
+        { value: 'Stilt Parking', label: 'Stilt Parking' },
+        { value: 'Valet Parking', label: 'Valet Parking' }
+      ]},
+      { name: 'oc_status', label: 'OC Status', type: 'select', options: [
+        { value: '', label: 'Select...' },
+        { value: 'Yes', label: 'Yes' },
+        { value: 'No', label: 'No' }
       ]},
       { name: 'status', label: 'Listing Status', type: 'select', options: [
         { value: 'Available', label: 'Available' },
         { value: 'Sold', label: 'Sold' },
-        { value: 'Rented', label: 'Rented' }
+        { value: 'Rented', label: 'Rented' },
+        { value: 'Under Negotiation', label: 'Under Negotiation' }
       ]},
-      { name: 'type', label: 'Category', type: 'select', options: [
-        { value: 'Buy', label: 'For Sale' },
-        { value: 'Rent', label: 'For Rent' }
+      { name: 'amenities', label: 'Amenities', type: 'checkbox-group', options: [
+        { value: 'Lift', label: 'Lift' },
+        { value: 'Security', label: 'Security' },
+        { value: 'CCTV', label: 'CCTV' },
+        { value: 'Power Backup', label: 'Power Backup' },
+        { value: 'Gym', label: 'Gym' },
+        { value: 'Swimming Pool', label: 'Swimming Pool' },
+        { value: 'Garden', label: 'Garden' },
+        { value: 'Club House', label: 'Club House' },
+        { value: 'Kids Play Area', label: 'Kids Play Area' },
+        { value: 'Visitor Parking', label: 'Visitor Parking' },
+        { value: 'Intercom', label: 'Intercom' },
+        { value: 'Fire Safety', label: 'Fire Safety' },
+        { value: 'Jogging Track', label: 'Jogging Track' }
       ]},
-      { name: 'furnishing_status', label: 'Furnishing', type: 'select', options: [
-        { value: 'Unfurnished', label: 'Unfurnished' },
-        { value: 'Semi-Furnished', label: 'Semi-Furnished' },
-        { value: 'Furnished', label: 'Furnished' }
-      ]},
-      { name: 'amenities', label: 'Amenities (Comma separated)', icon: CheckSquare },
+      { name: 'youtube_link', label: 'YouTube Video Link', icon: Video, type: 'url' },
+      { name: 'instagram_link', label: 'Instagram Link', icon: LinkIcon, type: 'url' },
       { name: 'images', label: 'Property Photos', type: 'file' },
       { name: 'description', label: 'Detailed Description', type: 'textarea' }
     ]
@@ -80,15 +123,51 @@ const CONFIG = {
     icon: MessageSquare,
     endpoint: '/inquiries',
     fields: [
-      { name: 'customer_name', label: 'Customer Full Name', icon: User, required: true },
-      { name: 'contact_info', label: 'Contact Details (Email/Phone)', icon: MapPin, required: true },
-      { name: 'property_id', label: 'Property ID (Optional)', type: 'number' },
-      { name: 'status', label: 'Lead Status', type: 'select', options: [
-        { value: 'New', label: 'New Lead' },
-        { value: 'Follow Up', label: 'Follow Up' },
+      { name: 'client_name', label: 'Client Name', icon: User, required: true },
+      { name: 'contact_number', label: 'Contact Number', icon: MapPin, required: true },
+      { name: 'alternate_contact_number', label: 'Alternate Contact Number', icon: MapPin },
+      { name: 'email_id', label: 'Email ID', icon: Type, type: 'email' },
+      { name: 'inquiry_type', label: 'Inquiry Type', type: 'select', required: true, options: [
+        { value: '', label: 'Select...' },
+        { value: 'Buy', label: 'Buy' },
+        { value: 'Rent', label: 'Rent' }
+      ]},
+      { name: 'property_size', label: 'Property Size', type: 'select', required: true, options: [
+        { value: '', label: 'Select...' },
+        { value: '1 BHK', label: '1 BHK' },
+        { value: '2 BHK', label: '2 BHK' },
+        { value: '3 BHK', label: '3 BHK' },
+        { value: '4 BHK', label: '4 BHK' },
+        { value: 'Other', label: 'Other' }
+      ]},
+      { name: 'budget', label: 'Budget (In Cr)', icon: DollarSign, type: 'number', step: '0.01', required: true },
+      { name: 'preferred_location', label: 'Preferred Location', type: 'select', required: true, options: [
+        { value: '', label: 'Select...' },
+        { value: 'BVI West', label: 'BVI West' },
+        { value: 'BVI East', label: 'BVI East' },
+        { value: 'KVI West', label: 'KVI West' },
+        { value: 'KVI East', label: 'KVI East' },
+        { value: 'Other', label: 'Other' }
+      ]},
+      { name: 'area', label: 'Preferred Area/Locality', icon: Building2 },
+      { name: 'inquiry_source', label: 'Inquiry From', type: 'select', options: [
+        { value: '', label: 'Select...' },
+        { value: 'YouTube', label: 'YouTube' },
+        { value: 'Instagram', label: 'Instagram' },
+        { value: 'Facebook', label: 'Facebook' },
+        { value: 'Magic Bricks', label: 'Magic Bricks' },
+        { value: 'Others', label: 'Others' }
+      ]},
+      { name: 'next_followup_date', label: 'Next Follow-up Date', type: 'date', icon: Calendar },
+      { name: 'followup_status', label: 'Follow-up Status', type: 'select', options: [
+        { value: 'New', label: 'New' },
+        { value: 'Interested', label: 'Interested' },
+        { value: 'Site Visit Planned', label: 'Site Visit Planned' },
         { value: 'Negotiation', label: 'Negotiation' },
-        { value: 'Closed', label: 'Closed' }
-      ]}
+        { value: 'Closed', label: 'Closed' },
+        { value: 'Not Interested', label: 'Not Interested' }
+      ]},
+      { name: 'comments', label: 'Comments / Notes', type: 'textarea' }
     ]
   },
   task: {
@@ -108,45 +187,82 @@ const CONFIG = {
   }
 };
 
-export default function GenericFormPage({ type }) {
+export default function GenericFormPage({ type, isEdit }) {
   const navigate = useNavigate();
+  const { id } = useParams();
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(isEdit);
   const [error, setError] = useState('');
   const [fileList, setFileList] = useState([]);
   const config = CONFIG[type];
 
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
+
+  useEffect(() => {
+    if (isEdit && id) {
+      api.get(`${config.endpoint}/${id}`)
+        .then(res => {
+          reset(res.data);
+          setFetching(false);
+        })
+        .catch(err => {
+          setError('Failed to fetch data.');
+          setFetching(false);
+        });
+    } else {
+      setFetching(false);
+    }
+  }, [isEdit, id, config.endpoint, reset]);
 
   const onSubmit = async (data) => {
     try {
       setLoading(true);
       setError('');
       
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (key !== 'images') formData.append(key, value);
-      });
+      let payload;
+      let headers = {};
 
       if (fileList.length > 0) {
+        // Use FormData for file uploads
+        const formData = new FormData();
+        Object.entries(data).forEach(([key, value]) => {
+          if (key !== 'images') {
+            // Handle arrays (like amenities) for FormData
+            if (Array.isArray(value)) {
+              formData.append(key, value.join(','));
+            } else {
+              formData.append(key, value || '');
+            }
+          }
+        });
+
         Array.from(fileList).forEach(file => {
           formData.append('images', file);
         });
+        payload = formData;
+      } else {
+        // Use JSON for standard data (more compatible with backend)
+        payload = data;
       }
 
-      await api.post(config.endpoint, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      if (isEdit) {
+        await api.put(`${config.endpoint}/${id}`, payload);
+      } else {
+        await api.post(config.endpoint, payload);
+      }
       
       navigate(-1);
     } catch (err) {
       console.error('Submission failed', err);
-      setError(err.response?.data?.message || 'Failed to save data. Please check all fields.');
+      // Try to get specific error message from server
+      const serverError = err.response?.data?.error || err.response?.data?.message;
+      setError(serverError || 'Failed to save data. Please check all fields.');
     } finally {
       setLoading(false);
     }
   };
 
-  if (!config) return null;
+  if (!config || fetching) return <div className="p-8 text-center text-slate-500 font-medium">Loading...</div>;
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 font-sans">
@@ -161,7 +277,8 @@ export default function GenericFormPage({ type }) {
       </button>
 
       <FormCard 
-        title={config.title} 
+        title={isEdit ? `Edit ${config.title.replace('Add New ', '')}` : config.title} 
+
         subtitle={config.subtitle} 
         icon={config.icon}
       >
@@ -174,7 +291,7 @@ export default function GenericFormPage({ type }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {config.fields.map((field) => (
-              <div key={field.name} className={field.type === 'textarea' ? 'md:col-span-2' : ''}>
+              <div key={field.name} className={field.type === 'textarea' || field.type === 'checkbox-group' ? 'md:col-span-2' : ''}>
                 <FormGroup label={field.label} error={errors[field.name]?.message} required={field.required}>
                   {field.type === 'select' ? (
                     <Select 
@@ -186,10 +303,25 @@ export default function GenericFormPage({ type }) {
                       placeholder={`Enter ${field.label.toLowerCase()}...`}
                       {...register(field.name, { required: field.required && `${field.label} is required` })} 
                     />
+                  ) : field.type === 'checkbox-group' ? (
+                    <Controller
+                      name={field.name}
+                      control={control}
+                      render={({ field: { onChange, value, ref } }) => (
+                        <CheckboxGroup options={field.options} value={value} onChange={onChange} ref={ref} />
+                      )}
+                    />
                   ) : field.type === 'file' ? (
-                    <FileInput 
-                      multiple
-                      onChange={(e) => setFileList(e.target.files)}
+                    <Controller
+                      name={field.name}
+                      control={control}
+                      render={({ field: { value } }) => (
+                        <FileInput 
+                          multiple
+                          onChange={(e) => setFileList(e.target.files)}
+                          value={fileList.length > 0 ? fileList : null}
+                        />
+                      )}
                     />
                   ) : (
                     <Input 

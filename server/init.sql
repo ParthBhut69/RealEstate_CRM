@@ -26,6 +26,14 @@ CREATE TABLE IF NOT EXISTS properties (
     area DECIMAL(10, 2),
     size VARCHAR(50),
     type VARCHAR(50),
+    property_for VARCHAR(50),
+    configuration VARCHAR(50),
+    carpet_area DECIMAL(10, 2),
+    price_in_cr DECIMAL(15, 2),
+    parking_type VARCHAR(50),
+    oc_status VARCHAR(20),
+    youtube_link VARCHAR(255),
+    instagram_link VARCHAR(255),
     amenities TEXT,
     image_url VARCHAR(255),
     images TEXT,
@@ -36,9 +44,21 @@ CREATE TABLE IF NOT EXISTS properties (
 CREATE TABLE IF NOT EXISTS inquiries (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     property_id INTEGER REFERENCES properties(id) ON DELETE SET NULL,
-    customer_name VARCHAR(255) NOT NULL,
-    contact_info VARCHAR(255) NOT NULL,
-    status VARCHAR(50) DEFAULT 'New',
+    client_name VARCHAR(255) NOT NULL,
+    contact_number VARCHAR(255) NOT NULL,
+    alternate_contact_number VARCHAR(50),
+    email_id VARCHAR(255),
+    inquiry_type VARCHAR(50), -- Buy, Rent
+    property_size VARCHAR(50), -- 1 BHK, 2 BHK, etc.
+    budget DECIMAL(15, 2), -- Budget in Cr
+    preferred_location VARCHAR(255),
+    area TEXT, -- Preferred area/locality
+    inquiry_source VARCHAR(100), -- YouTube, Instagram, etc.
+    comments TEXT,
+    next_followup_date DATETIME,
+    followup_status VARCHAR(50) DEFAULT 'New',
+    last_followup_date DATETIME,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

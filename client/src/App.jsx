@@ -33,7 +33,9 @@ function App() {
         <Route path="alerts" element={<Alerts />} />
         <Route path="profile" element={<Profile />} />
         <Route path="properties" element={<Properties />} />
+        <Route path="properties/:id/edit" element={<GenericFormPage type="property" isEdit={true} />} />
         <Route path="inquiries" element={<Inquiries />} />
+        <Route path="inquiries/:id/edit" element={<GenericFormPage type="inquiry" isEdit={true} />} />
         <Route path="tasks" element={<Tasks />} />
         <Route path="projects" element={<ProjectsList />} />
         <Route path="projects/new" element={<GenericFormPage type="project" />} />

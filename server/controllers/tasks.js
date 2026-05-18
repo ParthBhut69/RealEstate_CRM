@@ -22,7 +22,10 @@ exports.getById = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const keys = Object.keys(req.body);
+    const keys = Object.keys(req.body || {});
+    if (keys.length === 0) {
+      return res.status(400).json({ error: 'Request body cannot be empty' });
+    }
     const values = Object.values(req.body);
     const placeholders = keys.map(() => '?').join(', ');
     

@@ -4,7 +4,7 @@ import api from '../api/axios';
 
 const options = [
   { id: 'properties', label: 'Add Property', icon: Home, color: 'text-blue-600', bg: 'bg-blue-100', fields: [{name: 'title', label: 'Title'}, {name: 'price', label: 'Price', type: 'number'}, {name: 'description', label: 'Description', type: 'textarea'}] },
-  { id: 'inquiries', label: 'Add Inquiry', icon: MessageSquare, color: 'text-emerald-600', bg: 'bg-emerald-100', fields: [{name: 'customer_name', label: 'Customer Name'}, {name: 'contact_info', label: 'Contact Info'}, {name: 'property_id', label: 'Property ID', type: 'number'}] },
+  { id: 'inquiries', label: 'Add Inquiry', icon: MessageSquare, color: 'text-emerald-600', bg: 'bg-emerald-100', fields: [{name: 'client_name', label: 'Client Name'}, {name: 'contact_number', label: 'Contact Number'}, {name: 'property_id', label: 'Property ID', type: 'number'}] },
   { id: 'projects', label: 'Add Project', icon: Briefcase, color: 'text-purple-600', bg: 'bg-purple-100', fields: [{name: 'name', label: 'Project Name'}, {name: 'description', label: 'Description', type: 'textarea'}] },
   { id: 'tasks', label: 'Add Task', icon: CheckSquare, color: 'text-orange-600', bg: 'bg-orange-100', fields: [{name: 'title', label: 'Task Title'}, {name: 'due_date', label: 'Due Date', type: 'datetime-local'}] },
   { id: 'contacts', label: 'Add Contact', icon: Users, color: 'text-pink-600', bg: 'bg-pink-100', fields: [{name: 'name', label: 'Full Name'}, {name: 'email', label: 'Email Address', type: 'email'}, {name: 'phone', label: 'Phone Number'}] },

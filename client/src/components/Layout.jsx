@@ -1,13 +1,11 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import { Home, Bell, User, PlusCircle, Briefcase, Shield } from 'lucide-react';
-import { useState } from 'react';
 import AddActionMenu from './AddActionMenu';
 import NotificationToast from './NotificationToast';
 import { useNotifications } from '../context/NotificationContext';
 import { useAuth } from '../context/AuthContext';
 
 export default function Layout() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { unreadCount } = useNotifications();
   const { user } = useAuth();
   const isAdmin = user?.role?.toLowerCase() === 'admin';
@@ -95,7 +93,7 @@ export default function Layout() {
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around items-center h-16 px-2 z-10 shadow-[0_-4_6px_-1px_rgba(0,0,0,0.05)]">
+      <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around items-center h-16 px-2 z-50 shadow-[0_-4_6px_-1px_rgba(0,0,0,0.05)]">
         <NavLink to="/" className={({ isActive }) => `flex flex-col items-center justify-center w-16 h-full ${isActive ? 'text-blue-600' : 'text-slate-500'}`}>
           <Home className="w-6 h-6" />
           <span className="text-[10px] mt-1 font-medium">Home</span>
@@ -107,12 +105,21 @@ export default function Layout() {
         </NavLink>
 
         <div className="relative -top-5">
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl shadow-blue-200 border-4 border-slate-50 active:scale-90 transition-transform"
-          >
-            <PlusCircle className="w-8 h-8" />
-          </button>
+          <AddActionMenu 
+            direction="up"
+            customTrigger={(isLoading) => (
+              <button 
+                disabled={isLoading}
+                className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl shadow-blue-200 border-4 border-slate-50 active:scale-90 transition-transform disabled:opacity-70"
+              >
+                {isLoading ? (
+                  <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <PlusCircle className="w-8 h-8" />
+                )}
+              </button>
+            )}
+          />
         </div>
 
         <NavLink to="/alerts" className={({ isActive }) => `relative flex flex-col items-center justify-center w-16 h-full ${isActive ? 'text-blue-600' : 'text-slate-500'}`}>

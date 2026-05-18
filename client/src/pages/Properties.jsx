@@ -1,174 +1,189 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-import { Home, Plus, X, Pencil, Trash2, Filter, Image as ImageIcon, Download } from 'lucide-react';
+import { Home, Plus, X, Pencil, Trash2, Filter, Image as ImageIcon, Download, Share2, Copy, ChevronLeft, ChevronRight, Video, Link as LinkIcon, Search, RotateCcw } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import FilterDrawer from '../components/common/FilterDrawer';
+import SearchableSelect from '../components/common/SearchableSelect';
+import Modal from '../components/common/Modal';
 
-const STATUS_OPTIONS = ['Available', 'Sold', 'Rented', 'Off Market'];
-const SIZE_OPTIONS = ['', '1BHK', '2BHK', '3BHK', '4BHK', '5BHK+'];
-const TYPE_OPTIONS = ['', 'Rent', 'Buy', 'Commercial'];
-const FURNISH_OPTIONS = ['', 'Furnished', 'Semi-Furnished', 'Unfurnished'];
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-const EMPTY_FORM = { 
-  title: '', description: '', price: '', status: 'Available',
-  building_name: '', address: '', location: '', area: '', size: '', type: '', 
-  amenities: '', furnishing_status: ''
+const formatRupees = (amount) => {
+  if (!amount) return '₹0';
+  if (amount >= 10000000) {
+    return `₹${(amount / 10000000).toFixed(2)} Cr`;
+  }
+  if (amount >= 100000) {
+    return `₹${(amount / 100000).toFixed(2)} L`;
+  }
+  return `₹${Number(amount).toLocaleString('en-IN')}`;
 };
-
-function Modal({ title, onClose, children }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 py-8 overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-auto">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 sticky top-0 bg-white rounded-t-2xl z-10">
-          <h2 className="text-lg font-bold text-slate-800">{title}</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"><X className="w-5 h-5" /></button>
-        </div>
-        <div className="p-6">{children}</div>
-      </div>
-    </div>
-  );
-}
 
 const getImages = (imagesStr) => {
-  if (!imagesStr) return [];
-  try { return JSON.parse(imagesStr); } catch(e) { return []; }
+  try {
+    return JSON.parse(imagesStr || '[]');
+  } catch (e) {
+    return [];
+  }
 };
 
-const formatRupees = (val) => {
-  if (!val) return '₹0';
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0
-  }).format(val);
-};
+const CONFIG_OPTIONS = [
+  { value: '', label: 'All Configurations' },
+  { value: '1 BHK', label: '1 BHK' },
+  { value: '2 BHK', label: '2 BHK' },
+  { value: '3 BHK', label: '3 BHK' },
+  { value: '4 BHK', label: '4 BHK' },
+  { value: 'Studio', label: 'Studio' },
+  { value: 'Penthouse', label: 'Penthouse' },
+  { value: 'Duplex', label: 'Duplex' },
+  { value: 'Commercial', label: 'Commercial' }
+];
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
+const FOR_OPTIONS = [
+  { value: '', label: 'Any' },
+  { value: 'Buy', label: 'Buy' },
+  { value: 'Rent', label: 'Rent' }
+];
+
+const LOCATION_OPTIONS = [
+  { value: '', label: 'All Locations' },
+  { value: 'BVI West', label: 'BVI West' },
+  { value: 'BVI East', label: 'BVI East' },
+  { value: 'KVI West', label: 'KVI West' },
+  { value: 'KVI East', label: 'KVI East' },
+  { value: 'Others', label: 'Others' }
+];
+
+const FURNISH_OPTIONS = [
+  { value: '', label: 'Any' },
+  { value: 'Unfurnished', label: 'Unfurnished' },
+  { value: 'Semi Furnished', label: 'Semi Furnished' },
+  { value: 'Fully Furnished', label: 'Fully Furnished' }
+];
 
 export default function Properties() {
   const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
   const [viewing, setViewing] = useState(null);
-  const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [imageFiles, setImageFiles] = useState([]);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
   const [downloadingId, setDownloadingId] = useState(null);
-  
   const [showFilters, setShowFilters] = useState(false);
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  
   const [filters, setFilters] = useState({
-    minArea: '', maxArea: '', size: '', minPrice: '', maxPrice: '', type: '', furnishing_status: '', location: ''
+    configuration: '',
+    minPrice: '',
+    maxPrice: '',
+    property_for: '',
+    furnishing_status: '',
+    location: '',
+    building_name: ''
   });
 
-  const activeFilterCount = Object.values(filters).filter(v => v !== '').length;
+  const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => { fetchProperties(); }, [filters]);
+  const activeFilters = Object.entries(filters).filter(([key, value]) => value !== '');
+  const activeFilterCount = activeFilters.length + (searchTerm ? 1 : 0);
 
-  const fetchProperties = async () => {
+  const fetchProperties = useCallback(async (currentFilters, currentSearch) => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      Object.entries(filters).forEach(([key, value]) => {
+      Object.entries(currentFilters).forEach(([key, value]) => {
         if (value) params.append(key, value);
       });
+      if (currentSearch) params.append('building_name', currentSearch);
+      
       const { data } = await api.get(`/properties?${params.toString()}`);
       setProperties(data);
-    } catch (err) { console.error(err); }
-    finally { setLoading(false); }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      fetchProperties(filters, searchTerm);
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [filters, searchTerm, fetchProperties]);
+
+  const clearFilters = () => {
+    setFilters({
+      configuration: '',
+      minPrice: '',
+      maxPrice: '',
+      property_for: '',
+      furnishing_status: '',
+      location: '',
+      building_name: ''
+    });
+    setSearchTerm('');
   };
 
-  const openAdd = () => { navigate('/add-property'); };
-  
-  const openEdit = (prop) => { 
-    setEditing(prop); 
-    setForm({ 
-      title: prop.title, description: prop.description || '', price: prop.price, status: prop.status,
-      building_name: prop.building_name || '', address: prop.address || '', location: prop.location || '', area: prop.area || '', 
-      size: prop.size || '', type: prop.type || '', amenities: prop.amenities || '',
-      furnishing_status: prop.furnishing_status || ''
-    }); 
-    setImageFiles([]);
-    setError(''); 
-    setShowModal(true); 
+  const removeFilter = (key) => {
+    if (key === 'building_name') {
+      setSearchTerm('');
+    } else {
+      setFilters(prev => ({ ...prev, [key]: '' }));
+    }
   };
-  
-  const closeModal = () => { setShowModal(false); setEditing(null); setError(''); };
-  const closeViewModal = () => setViewing(null);
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
+  const handleFilterChange = (name, value) => {
     setFilters(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
-    if (!form.title || !form.price) { setError('Title and price are required.'); return; }
-    setSaving(true); setError('');
-    
-    const formData = new FormData();
-    Object.entries(form).forEach(([key, value]) => formData.append(key, value));
-    
-    if (imageFiles && imageFiles.length > 0) {
-      imageFiles.forEach(file => {
-        formData.append('images', file);
-      });
-    }
-
-    try {
-      if (editing) {
-        await api.put(`/properties/${editing.id}`, formData);
-      } else {
-        await api.post('/properties', formData);
-      }
-      await fetchProperties();
-      closeModal();
-    } catch (err) { setError(err.response?.data?.error || err.response?.data?.message || 'Failed to save.'); }
-    finally { setSaving(false); }
-  };
+  const openEdit = (prop) => navigate(`/properties/${prop.id}/edit`);
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this property?')) return;
-    try { await api.delete(`/properties/${id}`); setProperties(prev => prev.filter(p => p.id !== id)); }
-    catch (err) { alert('Failed to delete.'); }
+    if (!window.confirm('Are you sure you want to delete this property?')) return;
+    try {
+      await api.delete(`/properties/${id}`);
+      setProperties(prev => prev.filter(p => p.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete property');
+    }
   };
 
+  const closeViewModal = () => setViewing(null);
+
   const handleDownloadPDF = async (prop) => {
-    const element = document.getElementById(`pdf-${prop.id}`);
-    if (!element) return;
-    
+    setDownloadingId(prop.id);
     try {
-      setDownloadingId(prop.id);
-      const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+      const element = document.getElementById(`pdf-${prop.id}`);
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`${prop.title.replace(/\s+/g, '_')}.pdf`);
-    } catch (error) {
-      console.error('Failed to generate PDF', error);
-      alert('Failed to generate PDF. Make sure images are loaded.');
+    } catch (err) {
+      console.error('PDF Generation Error:', err);
     } finally {
       setDownloadingId(null);
     }
   };
 
-  const formatRupees = (amount) => {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20 md:pb-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-slate-800">Properties</h1>
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold text-slate-800">Properties</h1>
+          <p className="text-sm text-slate-500 font-medium">Manage and list real estate inventory</p>
+        </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowFilters(!showFilters)} className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors border ${showFilters ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}>
-            <Filter className="w-4 h-4" /> 
+          <button 
+            onClick={() => setIsMobileFilterOpen(true)}
+            className="md:hidden flex items-center gap-2 bg-white border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl font-bold active:scale-95 transition-all shadow-sm"
+          >
+            <Filter className="w-4 h-4" />
             Filters
             {activeFilterCount > 0 && (
               <span className="bg-blue-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
@@ -176,54 +191,151 @@ export default function Properties() {
               </span>
             )}
           </button>
-          <button onClick={openAdd} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">
-            <Plus className="w-4 h-4" /> Add Property
+          <button onClick={() => navigate('/add-property')} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-100">
+            <Plus className="w-5 h-5" /> Add Property
           </button>
         </div>
       </div>
 
-      {showFilters && (
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 items-end">
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Location</label>
-            <input type="text" name="location" value={filters.location} onChange={handleFilterChange} placeholder="e.g. Vasai" className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      {/* Desktop Filter Bar */}
+      <div className="hidden md:block bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-slate-800 font-bold">
+            <Filter className="w-4 h-4 text-blue-600" />
+            Advanced Filters
           </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Type</label>
-            <select name="type" value={filters.type} onChange={handleFilterChange} className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-              {TYPE_OPTIONS.map(o => <option key={o} value={o}>{o || 'All'}</option>)}
-            </select>
+          {activeFilterCount > 0 && (
+            <button onClick={clearFilters} className="text-sm text-red-500 font-bold hover:text-red-600 flex items-center gap-1 transition-colors">
+              <RotateCcw className="w-3.5 h-3.5" />
+              Clear Filters
+            </button>
+          )}
+        </div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="lg:col-span-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">Building Name</label>
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="Search building..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-50 transition-all font-medium" 
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Size</label>
-            <select name="size" value={filters.size} onChange={handleFilterChange} className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-              {SIZE_OPTIONS.map(o => <option key={o} value={o}>{o || 'All'}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Furnishing</label>
-            <select name="furnishing_status" value={filters.furnishing_status} onChange={handleFilterChange} className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-              {FURNISH_OPTIONS.map(o => <option key={o} value={o}>{o || 'All'}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Min Area</label>
-            <input type="number" name="minArea" value={filters.minArea} onChange={handleFilterChange} placeholder="sqft" className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Max Area</label>
-            <input type="number" name="maxArea" value={filters.maxArea} onChange={handleFilterChange} placeholder="sqft" className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Min Price</label>
-            <input type="number" name="minPrice" value={filters.minPrice} onChange={handleFilterChange} placeholder="₹" className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Max Price</label>
-            <input type="number" name="maxPrice" value={filters.maxPrice} onChange={handleFilterChange} placeholder="₹" className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
+          <SearchableSelect 
+            label="Location"
+            options={LOCATION_OPTIONS}
+            value={filters.location}
+            onChange={(val) => handleFilterChange('location', val)}
+            placeholder="All Locations"
+          />
+          <SearchableSelect 
+            label="Configuration"
+            options={CONFIG_OPTIONS}
+            value={filters.configuration}
+            onChange={(val) => handleFilterChange('configuration', val)}
+            placeholder="All BHK"
+          />
+          <SearchableSelect 
+            label="Property For"
+            options={FOR_OPTIONS}
+            value={filters.property_for}
+            onChange={(val) => handleFilterChange('property_for', val)}
+            placeholder="Buy/Rent"
+          />
+          <SearchableSelect 
+            label="Furnishing"
+            options={FURNISH_OPTIONS}
+            value={filters.furnishing_status}
+            onChange={(val) => handleFilterChange('furnishing_status', val)}
+            placeholder="Any"
+          />
+        </div>
+      </div>
+
+      {/* Active Filter Chips */}
+      {activeFilterCount > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {searchTerm && (
+            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-bold border border-blue-100">
+              Building: {searchTerm}
+              <X className="w-3 h-3 cursor-pointer hover:text-blue-900" onClick={() => removeFilter('building_name')} />
+            </span>
+          )}
+          {activeFilters.map(([key, value]) => {
+            const label = key.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const optionsMap = {
+              location: LOCATION_OPTIONS,
+              configuration: CONFIG_OPTIONS,
+              property_for: FOR_OPTIONS,
+              furnishing_status: FURNISH_OPTIONS
+            };
+            const displayValue = optionsMap[key]?.find(o => o.value === value)?.label || value;
+            return (
+              <span key={key} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-xs font-bold border border-slate-200">
+                {label}: {displayValue}
+                <X className="w-3 h-3 cursor-pointer hover:text-slate-900" onClick={() => removeFilter(key)} />
+              </span>
+            );
+          })}
         </div>
       )}
+
+      {/* Mobile Filter Drawer */}
+      <FilterDrawer
+        isOpen={isMobileFilterOpen}
+        onClose={() => setIsMobileFilterOpen(false)}
+        onClear={clearFilters}
+        activeCount={activeFilterCount}
+      >
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Building Name</label>
+            <div className="relative">
+              <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="Search building..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-base focus:outline-none focus:ring-4 focus:ring-blue-50 transition-all" 
+              />
+            </div>
+          </div>
+          <SearchableSelect 
+            label="Location"
+            options={LOCATION_OPTIONS}
+            value={filters.location}
+            onChange={(val) => handleFilterChange('location', val)}
+            placeholder="All Locations"
+          />
+          <SearchableSelect 
+            label="Configuration"
+            options={CONFIG_OPTIONS}
+            value={filters.configuration}
+            onChange={(val) => handleFilterChange('configuration', val)}
+            placeholder="All BHK"
+          />
+          <SearchableSelect 
+            label="Property For"
+            options={FOR_OPTIONS}
+            value={filters.property_for}
+            onChange={(val) => handleFilterChange('property_for', val)}
+            placeholder="Buy/Rent"
+          />
+          <SearchableSelect 
+            label="Furnishing"
+            options={FURNISH_OPTIONS}
+            value={filters.furnishing_status}
+            onChange={(val) => handleFilterChange('furnishing_status', val)}
+            placeholder="Any"
+          />
+        </div>
+      </FilterDrawer>
 
       {loading ? (
         <div className="text-center p-8 text-slate-500">Loading...</div>
@@ -292,7 +404,7 @@ export default function Properties() {
             <div className="col-span-full text-center py-16 bg-white rounded-2xl border border-slate-100">
               <Home className="w-12 h-12 text-slate-300 mx-auto mb-4" />
               <p className="text-slate-500 font-medium text-lg">No properties match your criteria.</p>
-              <button onClick={() => setFilters({ minArea: '', maxArea: '', size: '', minPrice: '', maxPrice: '', type: '', furnishing_status: '', location: ''})} className="mt-3 text-blue-600 font-medium hover:underline">Clear Filters</button>
+              <button onClick={clearFilters} className="mt-3 text-blue-600 font-medium hover:underline">Clear Filters</button>
             </div>
           )}
         </div>
@@ -510,95 +622,6 @@ export default function Properties() {
               </div>
             );
           })()}
-        </Modal>
-      )}
-
-      {showModal && (
-        <Modal title={editing ? 'Edit Property' : 'Add Property'} onClose={closeModal}>
-          <form onSubmit={handleSave} className="space-y-4">
-            {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</p>}
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-slate-700 mb-1">Title *</label>
-                <input type="text" value={form.title} onChange={e => setForm({...form, title: e.target.value})} placeholder="e.g. Luxury Apartment" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Building / Project Name</label>
-                <input type="text" value={form.building_name} onChange={e => setForm({...form, building_name: e.target.value})} placeholder="e.g. Sunset Heights" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Location</label>
-                <input type="text" value={form.location} onChange={e => setForm({...form, location: e.target.value})} placeholder="e.g. Vasai, Mumbai" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
-                <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                  {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-slate-700 mb-1">Full Address</label>
-                <input type="text" value={form.address} onChange={e => setForm({...form, address: e.target.value})} placeholder="Full location address" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Property Type</label>
-                <select value={form.type} onChange={e => setForm({...form, type: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                  {TYPE_OPTIONS.map((o,i) => <option key={i} value={o}>{o || 'Select...'}</option>)}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Size</label>
-                <select value={form.size} onChange={e => setForm({...form, size: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                  {SIZE_OPTIONS.map((o,i) => <option key={i} value={o}>{o || 'Select...'}</option>)}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Area (sq.ft)</label>
-                <input type="number" value={form.area} onChange={e => setForm({...form, area: e.target.value})} placeholder="e.g. 1200" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Furnishing Status</label>
-                <select value={form.furnishing_status} onChange={e => setForm({...form, furnishing_status: e.target.value})} className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                  {FURNISH_OPTIONS.map((o,i) => <option key={i} value={o}>{o || 'Select...'}</option>)}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Price (₹) *</label>
-                <input type="number" value={form.price} onChange={e => setForm({...form, price: e.target.value})} placeholder="0" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              </div>
-              
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-slate-700 mb-1">Property Images</label>
-                <input type="file" multiple accept="image/*" onChange={e => setImageFiles(Array.from(e.target.files))} className="w-full px-3 py-[7px] text-sm border border-slate-200 rounded-lg file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-                {imageFiles.length > 0 && <p className="text-xs text-slate-500 mt-1">{imageFiles.length} file(s) selected</p>}
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-slate-700 mb-1">Amenities</label>
-                <input type="text" value={form.amenities} onChange={e => setForm({...form, amenities: e.target.value})} placeholder="e.g. Pool, Gym, Parking (comma separated)" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-                <textarea rows={3} value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="Detailed property description..." className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-              <button type="button" onClick={closeModal} className="px-5 py-2.5 text-slate-600 font-medium rounded-lg hover:bg-slate-100 transition-colors">Cancel</button>
-              <button type="submit" disabled={saving} className="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-60 shadow-sm">{saving ? 'Saving...' : editing ? 'Update Property' : 'Add Property'}</button>
-            </div>
-          </form>
         </Modal>
       )}
     </div>
