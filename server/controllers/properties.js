@@ -47,11 +47,12 @@ exports.create = async (req, res) => {
       image_url = paths[0];
       images = JSON.stringify(paths);
     }
-    let calculatedPrice = 0;
-    if (price !== undefined && price !== null && price !== '' && !isNaN(price)) {
-      calculatedPrice = parseFloat(price);
-    } else if (price_in_cr !== undefined && price_in_cr !== null && price_in_cr !== '' && !isNaN(price_in_cr)) {
+    let calculatedPrice = parseFloat(price);
+    if (isNaN(calculatedPrice)) {
       calculatedPrice = parseFloat(price_in_cr) * 10000000;
+    }
+    if (isNaN(calculatedPrice)) {
+      calculatedPrice = 0;
     }
     
     // Use RETURNING id for PostgreSQL to get inserted id
@@ -80,11 +81,12 @@ exports.update = async (req, res) => {
     const { id } = req.params;
     const { title, description, price, status, building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link } = req.body;
     
-    let calculatedPrice = 0;
-    if (price !== undefined && price !== null && price !== '' && !isNaN(price)) {
-      calculatedPrice = parseFloat(price);
-    } else if (price_in_cr !== undefined && price_in_cr !== null && price_in_cr !== '' && !isNaN(price_in_cr)) {
+    let calculatedPrice = parseFloat(price);
+    if (isNaN(calculatedPrice)) {
       calculatedPrice = parseFloat(price_in_cr) * 10000000;
+    }
+    if (isNaN(calculatedPrice)) {
+      calculatedPrice = 0;
     }
     
     let query = 'UPDATE properties SET title = ?, description = ?, price = ?, status = ?, building_name = ?, address = ?, location = ?, property_for = ?, configuration = ?, carpet_area = ?, price_in_cr = ?, amenities = ?, furnishing_status = ?, parking_type = ?, oc_status = ?, youtube_link = ?, instagram_link = ?';
