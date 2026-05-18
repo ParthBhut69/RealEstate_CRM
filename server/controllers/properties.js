@@ -47,7 +47,12 @@ exports.create = async (req, res) => {
       image_url = paths[0];
       images = JSON.stringify(paths);
     }
-    const calculatedPrice = price || (price_in_cr ? parseFloat(price_in_cr) * 10000000 : 0);
+    let calculatedPrice = 0;
+    if (price !== undefined && price !== null && price !== '' && !isNaN(price)) {
+      calculatedPrice = parseFloat(price);
+    } else if (price_in_cr !== undefined && price_in_cr !== null && price_in_cr !== '' && !isNaN(price_in_cr)) {
+      calculatedPrice = parseFloat(price_in_cr) * 10000000;
+    }
     
     // Use RETURNING id for PostgreSQL to get inserted id
     const insertSql = 'INSERT INTO properties (title, description, price, status, building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link, image_url, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
@@ -75,7 +80,12 @@ exports.update = async (req, res) => {
     const { id } = req.params;
     const { title, description, price, status, building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link } = req.body;
     
-    const calculatedPrice = price || (price_in_cr ? parseFloat(price_in_cr) * 10000000 : 0);
+    let calculatedPrice = 0;
+    if (price !== undefined && price !== null && price !== '' && !isNaN(price)) {
+      calculatedPrice = parseFloat(price);
+    } else if (price_in_cr !== undefined && price_in_cr !== null && price_in_cr !== '' && !isNaN(price_in_cr)) {
+      calculatedPrice = parseFloat(price_in_cr) * 10000000;
+    }
     
     let query = 'UPDATE properties SET title = ?, description = ?, price = ?, status = ?, building_name = ?, address = ?, location = ?, property_for = ?, configuration = ?, carpet_area = ?, price_in_cr = ?, amenities = ?, furnishing_status = ?, parking_type = ?, oc_status = ?, youtube_link = ?, instagram_link = ?';
     let params = [title, description, calculatedPrice, status, building_name, address, location, property_for, configuration, carpet_area, price_in_cr, amenities, furnishing_status, parking_type, oc_status, youtube_link, instagram_link];
